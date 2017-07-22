@@ -1,0 +1,4 @@
+--slow 5
+--recursive
+--require babel-polyfill
+--require ./test/unit/setup.js

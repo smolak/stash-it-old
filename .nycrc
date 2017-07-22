@@ -1,0 +1,31 @@
+{
+  "lines": 100,
+  "statements": 100,
+  "functions": 100,
+  "branches": 100,
+  "watermarks": {
+      "lines": [90, 100],
+      "functions": [90, 100],
+      "branches": [90, 100],
+      "statements": [90, 100]
+  },
+  "exclude": [
+    "node_modules",
+    ".idea/**",
+    "build/**",
+    "coverage/**",
+    "**/tests/*.*"
+  ],
+  "reporter": [
+    "lcov",
+    "text-summary"
+  ],
+  "require": [
+      "babel-register"
+  ],
+  "cache": true,
+  "all": true,
+  "report-dir": "./coverage",
+  "sourceMap": false,
+  "instrument": false
+}

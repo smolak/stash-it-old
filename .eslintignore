@@ -1,0 +1,6 @@
+.idea/
+coverage/
+build/
+node_modules/
+*webpack.config.js
+README.md
