@@ -42,6 +42,7 @@
     "nyc": "^10.3.2",
     "sinon": "^2.3.8",
     "sinon-chai": "^2.12.0",
-    "sinon-test": "^1.0.2"
+    "sinon-test": "^1.0.2",
+    "stash-it-test-helpers": "^1.1.0"
   }
 }
