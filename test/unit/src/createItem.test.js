@@ -1,6 +1,6 @@
 import { expect } from 'chai';
+import { nonObjectValues } from 'stash-it-test-helpers';
 
-import { nonObjectValues } from '../helpers/validatonTests';
 import createItem from '../../../src/createItem';
 
 describe('createItem', () => {

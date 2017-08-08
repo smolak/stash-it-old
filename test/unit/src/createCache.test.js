@@ -1,10 +1,19 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
+import {
+    createDummyAdapter,
+    FOO_KEY,
+    FOO_VALUE,
+    FOO_WITH_EXTRA_KEY,
+    FOO_EXTRA,
+    nonArrayValues,
+    nonFunctionValues,
+    nonObjectValues,
+    nonStringValues
+} from 'stash-it-test-helpers';
 
 import createItem from '../../../src/createItem';
 import createCache, { getPreData, getPostData } from '../../../src/createCache';
-import { createDummyAdapter, FOO_KEY, FOO_VALUE, FOO_WITH_EXTRA_KEY, FOO_EXTRA } from '../helpers/dummyAdapter';
-import { nonArrayValues, nonFunctionValues, nonObjectValues, nonStringValues } from '../helpers/validatonTests';
 
 describe('createCache', () => {
     const namespace = 'namespace';
@@ -12,7 +21,7 @@ describe('createCache', () => {
     let dummyAdapter;
 
     beforeEach(() => {
-        dummyAdapter = createDummyAdapter({ namespace });
+        dummyAdapter = createDummyAdapter(createItem, { namespace });
         cache = createCache(dummyAdapter);
     });
 

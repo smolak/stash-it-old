@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
+import { createDummyAdapter, nonArrayValues, nonFunctionValues, nonObjectValues } from 'stash-it-test-helpers';
 
+import createItem from '../../../src/createItem';
 import registerPlugins from '../../../src/registerPlugins';
 import createCache from '../../../src/createCache';
-import { createDummyAdapter } from '../helpers/dummyAdapter';
-import { nonArrayValues, nonFunctionValues, nonObjectValues } from '../helpers/validatonTests';
 
 describe('registerPlugins', () => {
     const methods = {
@@ -21,7 +21,7 @@ describe('registerPlugins', () => {
     let dummyAdapter;
 
     beforeEach(() => {
-        dummyAdapter = createDummyAdapter({ namespace });
+        dummyAdapter = createDummyAdapter(createItem, { namespace });
         cache = createCache(dummyAdapter);
 
         getExtensionsStub.resetHistory();
