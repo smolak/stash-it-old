@@ -1,3 +1,16 @@
+<table>
+  <thead>
+    <tr>
+      <th><strong>Home</strong></th>
+      <th><a href="https://smolak.github.io/stash-it/createCache.html">createCache</a></th>
+      <th><a href="https://smolak.github.io/stash-it/registerPlugins.html">registerPlugins</a></th>
+      <th><a href="https://smolak.github.io/stash-it/createItem.html">createItem</a></th>
+      <th><a href="https://smolak.github.io/stash-it/adapters.html">adapters</a></th>
+      <th><a href="https://smolak.github.io/stash-it/plugins.html">plugins</a></th>
+    </tr>
+  </thead>
+</table>
+
 # stash-it
 Cache mechanism based on plugins.
 
@@ -7,9 +20,7 @@ Cache mechanism based on plugins.
 npm i stash-it --save
 ```
 
-## Usage
-
-### createCache(adapter)
+## createCache(adapter)
 
 ```javascript
 import { createCache } from 'stash-it';
@@ -23,7 +34,7 @@ cache.setItem('key', 'value');
 cache.hasItem('key'); // true
 ```
 
-### registerPlugins(cacheInstance, plugins)
+## registerPlugins(cacheInstance, plugins)
 
 ```javascript
 import { createCache, registerPlugins } from 'stash-it';
@@ -39,14 +50,10 @@ const cacheWithPlugins = registerPlugins(cache, [ debugPlugin ]);
 cacheWithPlugins.runDiagnostics(); // method added by debug plugin
 ```
 
-### createItem(key, value, namespace, \[extra\])
+## createItem(key, value, namespace, \[extra\])
 
 ```javascript
 import { createItem } from 'stash-it';
 
 const item = createItem('key', 'value', 'namespace', { some: 'extraData' });
 ```
-
-And that's it.
-
-For full docs, checkout https://smolak.github.io/stash-it/.
