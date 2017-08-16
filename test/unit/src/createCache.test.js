@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
+import R from 'ramda';
 import {
     createDummyAdapter,
     FOO_KEY,
@@ -43,6 +44,50 @@ describe('createCache', () => {
         ];
 
         expect(cache).to.have.all.keys(expectedMethods);
+    });
+
+    context('when adapter is not an object', () => {
+        it('should throw', () => {
+            nonObjectValues.forEach((adapterDouble) => {
+                expect(createCache.bind(null, adapterDouble)).to.throw('`adapter` must be an object.');
+            });
+        });
+    });
+
+    context('when not all required methods are present', () => {
+        it('should throw', () => {
+            const requiredMethods = [ 'buildKey', 'getItem', 'getExtra', 'setItem', 'hasItem', 'removeItem' ];
+
+            requiredMethods.forEach((methodName, index) => {
+                const allMethodsButOne = R.remove(index, 1, requiredMethods);
+                const adapterDouble = {};
+
+                allMethodsButOne.forEach((methodName) => {
+                    adapterDouble[methodName] = '';
+                });
+
+                expect(createCache.bind(null, adapterDouble)).to.throw('Not all required methods are present in adapter.');
+            });
+        });
+    });
+
+    context('when not all required methods are functions', () => {
+        it('should throw', () => {
+            const requiredMethods = [ 'buildKey', 'getItem', 'getExtra', 'setItem', 'hasItem', 'removeItem' ];
+
+            requiredMethods.forEach((methodName, index) => {
+                const allMethodsButOne = R.remove(index, 1, requiredMethods);
+                const adapterDouble = {
+                    [methodName]: ''
+                };
+
+                allMethodsButOne.forEach((methodName) => {
+                    adapterDouble[methodName] = () => {};
+                });
+
+                expect(createCache.bind(null, adapterDouble)).to.throw('Not all required methods are functions.');
+            });
+        });
     });
 
     describe('hooks', () => {

@@ -1,3 +1,24 @@
+const methodIsPresentIn = (methods) => (method) => methods.includes(method);
+const isAFunction = (something) => typeof something === 'function';
+
+function validateAdapter(adapter, requiredMethods) {
+    if (typeof adapter !== 'object' || adapter === null || Array.isArray(adapter)) {
+        throw new Error('`adapter` must be an object.');
+    }
+
+    const adaptersMethods = Object.keys(adapter);
+    const allRequiredMethodsArePresent = requiredMethods.every(methodIsPresentIn(adaptersMethods));
+    const allMethodsAreFunctions = adaptersMethods.every((methodName) => isAFunction(adapter[methodName]));
+
+    if (!allRequiredMethodsArePresent) {
+        throw new Error('Not all required methods are present in adapter.');
+    }
+
+    if (!allMethodsAreFunctions) {
+        throw new Error('Not all required methods are functions.');
+    }
+}
+
 function validateArgs(args) {
     if (typeof args !== 'object' || args === null || Array.isArray(args)) {
         throw new Error('`args` must be an object.');
@@ -15,11 +36,11 @@ function upperFirst(string) {
     return `${firstLetter.toUpperCase()}${restOfTheString}`;
 }
 
-const passDataThroughHooks = (hooks, event, args) => {
+function passDataThroughHooks(hooks, event, args) {
     return Array.isArray(hooks[event])
         ? hooks[event].reduce((prev, next, index) => hooks[event][index](prev), args)
         : args;
-};
+}
 
 export const getPreData = (methodName, args) => {
     validateArgs(args);
@@ -39,7 +60,11 @@ export const getPostData = (methodName, args) => {
     return passDataThroughHooks(hooks, event, args);
 };
 
+const requiredMethods = [ 'buildKey', 'getItem', 'getExtra', 'setItem', 'hasItem', 'removeItem' ];
+
 export default function createCache(adapter) {
+    validateAdapter(adapter, requiredMethods);
+
     const hooks = {};
 
     return {
