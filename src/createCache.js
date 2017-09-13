@@ -29,6 +29,12 @@ function validateArgs(args) {
     }
 }
 
+function validateMethodName(methodName) {
+    if (typeof methodName !== 'string') {
+        throw new Error('`methodName` must be a string.');
+    }
+}
+
 function upperFirst(string) {
     const firstLetter = string[0];
     const restOfTheString = string.substr(1);
@@ -43,6 +49,7 @@ function passDataThroughHooks(hooks, event, args) {
 }
 
 export const getPreData = (methodName, args) => {
+    validateMethodName(methodName);
     validateArgs(args);
 
     const hooks = args.cacheInstance.getHooks();
@@ -52,6 +59,7 @@ export const getPreData = (methodName, args) => {
 };
 
 export const getPostData = (methodName, args) => {
+    validateMethodName(methodName);
     validateArgs(args);
 
     const hooks = args.cacheInstance.getHooks();

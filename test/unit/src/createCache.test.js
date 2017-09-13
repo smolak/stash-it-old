@@ -257,6 +257,15 @@ describe('createCache', () => {
     });
 
     describe('getPreData', () => {
+        context('when method name is not passed as a string', () => {
+            it('should throw', () => {
+                nonStringValues.forEach((methodName) => {
+                    expect(getPreData.bind(null, methodName))
+                        .to.throw('`methodName` must be a string.');
+                });
+            });
+        });
+
         context('when args are not passed as an object', () => {
             it('should throw', () => {
                 nonObjectValues.forEach((value) => {
@@ -342,6 +351,15 @@ describe('createCache', () => {
     });
 
     describe('getPostData', () => {
+        context('when method name is not passed as a string', () => {
+            it('should throw', () => {
+                nonStringValues.forEach((methodName) => {
+                    expect(getPostData.bind(null, methodName))
+                        .to.throw('`methodName` must be a string.');
+                });
+            });
+        });
+
         context('when args are not passed as an object', () => {
             it('should throw', () => {
                 nonObjectValues.forEach((value) => {
