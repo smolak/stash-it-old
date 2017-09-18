@@ -13,6 +13,9 @@ stash-it can be used in various environments \(client, server or native\), depen
 
 It's very small ~2kB \(including memory adapter, minified + gzipped\) with no dependencies whatsoever.
 
+[![build status](https://img.shields.io/travis/reactjs/redux/master.svg?style=flat-square)](https://travis-ci.org/reactjs/redux)
+[![Coverage Status](https://coveralls.io/repos/github/smolak/stash-it/badge.svg?branch=master)](https://coveralls.io/github/smolak/stash-it?branch=master)
+
 ### Why stash-it?
 
 At one time, I was looking for a cache mechanism for node, that would allow me to add tags to stored items. I found some solutions. But when I dug deeper I started to find various modules that were either too big, had too few / many methods, were hard to use or not maintained for a very long time.
@@ -67,7 +70,7 @@ And that's pretty much it.
 
 ### Documentation
 
-[http://stash-it.js.org](http://stash-it.js.org)
+[gitbook.com/book/jaceks/stash-it](gitbook.com/book/jaceks/stash-it)
 
 ### Thanks
 
