@@ -13,7 +13,7 @@ stash-it can be used in various environments \(client, server or native\), depen
 
 It's very small ~2kB \(including memory adapter, minified + gzipped\) with no dependencies whatsoever.
 
-[![build status](https://img.shields.io/travis/reactjs/redux/master.svg?style=flat-square)](https://travis-ci.org/reactjs/redux)
+[![build status](https://img.shields.io/travis/smolak/stash-it/master.svg?style=flat-square)](https://travis-ci.org/smolak/stash-it)
 [![Coverage Status](https://coveralls.io/repos/github/smolak/stash-it/badge.svg?branch=master)](https://coveralls.io/github/smolak/stash-it?branch=master)
 
 ### Why stash-it?
@@ -70,7 +70,7 @@ And that's pretty much it.
 
 ### Documentation
 
-[gitbook.com/book/jaceks/stash-it](gitbook.com/book/jaceks/stash-it)
+[https://gitbook.com/book/jaceks/stash-it](https://gitbook.com/book/jaceks/stash-it)
 
 ### Thanks
 
