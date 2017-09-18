@@ -4,7 +4,7 @@ import { createDummyAdapter, nonArrayValues, nonFunctionValues, nonObjectValues 
 
 import createItem from '../../../src/createItem';
 import registerPlugins from '../../../src/registerPlugins';
-import createCache from '../../../src/createCache';
+import { createCache } from '../../../src/createCache';
 
 describe('registerPlugins', () => {
     const methods = {

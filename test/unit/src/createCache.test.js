@@ -14,7 +14,7 @@ import {
 } from 'stash-it-test-helpers';
 
 import createItem from '../../../src/createItem';
-import createCache, { getPreData, getPostData } from '../../../src/createCache';
+import { createCache, getPreData, getPostData } from '../../../src/createCache';
 
 describe('createCache', () => {
     const namespace = 'namespace';

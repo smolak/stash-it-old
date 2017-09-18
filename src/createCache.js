@@ -70,7 +70,7 @@ export const getPostData = (methodName, args) => {
 
 const requiredMethods = [ 'buildKey', 'getItem', 'getExtra', 'setItem', 'hasItem', 'removeItem' ];
 
-export default function createCache(adapter) {
+export function createCache(adapter) {
     validateAdapter(adapter, requiredMethods);
 
     const hooks = {};
