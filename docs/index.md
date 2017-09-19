@@ -1,3 +1,3 @@
 # Docs moved
 
-**[http://stash-it.js.org](http://stash-it.js.org)**
+**[https://gitbook.com/book/jaceks/stash-it](https://gitbook.com/book/jaceks/stash-it)**
