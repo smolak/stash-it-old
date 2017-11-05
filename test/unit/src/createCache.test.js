@@ -815,7 +815,7 @@ describe('createCache', () => {
                     .to.have.been.calledOnce;
             });
 
-            it('should call getPreData, getExtra, getPostData in correct sequence', () => {
+            it('should call getPreData, setItem, getPostData in correct sequence', () => {
                 cache.setItem(FOO_KEY, FOO_VALUE);
 
                 expect(preStub).to.have.been.calledOnce;
