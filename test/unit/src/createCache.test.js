@@ -889,6 +889,56 @@ describe('createCache', () => {
                 .to.have.been.calledOnce;
         });
 
+        describe('extra validation', () => {
+            beforeEach(() => {
+                cache.addHooks([
+                    {
+                        event: 'preSetExtra',
+                        handler: preStub
+                    },
+                    {
+                        event: 'postSetExtra',
+                        handler: postStub
+                    }
+                ]);
+            });
+
+            it('should happen after getPreData', () => {
+                try {
+                    cache.setExtra(FOO_KEY, null);
+                }
+                catch (e) {
+                    expect(preStub).to.have.been.calledOnce;
+                }
+            });
+
+            it('should happen before using adapter\'s setExtra method', () => {
+                try {
+                    cache.setExtra(FOO_KEY, null);
+                }
+                catch (e) {
+                    expect(dummyAdapter.setExtra).to.not.have.been.called;
+                }
+            });
+
+            it('should happen before getPostData', () => {
+                try {
+                    cache.setExtra(FOO_KEY, null);
+                }
+                catch (e) {
+                    expect(postStub).to.not.have.been.called;
+                }
+            });
+
+            context('when extra is not an object', () => {
+                it('should throw', () => {
+                    nonObjectValues.forEach((extra) => {
+                        expect(cache.setExtra.bind(cache, FOO_KEY, extra)).to.throw('`extra` must be an object.');
+                    });
+                });
+            });
+        });
+
         context('when item does not exist', () => {
             it('should return undefined', () => {
                 const setExtra = cache.setExtra(NONEXISTENT_KEY, FOO_EXTRA);
@@ -935,7 +985,7 @@ describe('createCache', () => {
             });
 
             it('should call getPreData, setExtra, getPostData in correct sequence', () => {
-                cache.setExtra(FOO_KEY, FOO_VALUE);
+                cache.setExtra(FOO_KEY, FOO_EXTRA);
 
                 expect(preStub).to.have.been.calledOnce;
                 expect(dummyAdapter.setExtra)

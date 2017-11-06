@@ -1,4 +1,4 @@
-import { validateAdapter, validateArgs, validateMethodName } from './validation';
+import { validateAdapter, validateArgs, validateExtra, validateMethodName } from './validation';
 
 function upperFirst(string) {
     const firstLetter = string[0];
@@ -109,6 +109,9 @@ export function createCache(adapter) {
 
         setExtra(key, extra) {
             const preData = getPreData('setExtra', { cacheInstance: this, key, extra });
+
+            validateExtra(preData.extra);
+
             const setExtra =
                 this.hasItem(preData.key) ?
                     adapter.setExtra(this.buildKey(preData.key), preData.extra) :
