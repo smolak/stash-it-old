@@ -1,8 +1,4 @@
-function validateExtra(extra) {
-    if (typeof extra !== 'object' || extra === null || Array.isArray(extra)) {
-        throw new Error('`extra` must be an object.');
-    }
-}
+import { validateExtra } from './validation';
 
 export default function createItem(key, value, namespace, extra = {}) {
     validateExtra(extra);
