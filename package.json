@@ -44,6 +44,6 @@
     "ramda": "^0.25.0",
     "sinon": "^4.1.1",
     "sinon-chai": "^2.14.0",
-    "stash-it-test-helpers": "^1.4.0"
+    "stash-it-test-helpers": "^1.5.1"
   }
 }
