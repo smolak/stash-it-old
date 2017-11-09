@@ -107,6 +107,21 @@ export function createCache(adapter) {
             return postData.item;
         },
 
+        addExtra(key, extra) {
+            const preData = getPreData('addExtra', { cacheInstance: this, key, extra });
+
+            validateExtra(preData.extra);
+
+            const addedExtra =
+                this.hasItem(preData.key) ?
+                    adapter.addExtra(this.buildKey(preData.key), preData.extra) :
+                    undefined;
+            const postData = getPostData('addExtra', {
+                cacheInstance: preData.cacheInstance, key: preData.key, extra: addedExtra });
+
+            return postData.extra;
+        },
+
         setExtra(key, extra) {
             const preData = getPreData('setExtra', { cacheInstance: this, key, extra });
 
