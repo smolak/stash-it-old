@@ -1,39 +1,4 @@
-const methodIsPresentIn = (methods) => (method) => methods.includes(method);
-const isAFunction = (something) => typeof something === 'function';
-
-function validateAdapter(adapter, requiredMethods) {
-    if (typeof adapter !== 'object' || adapter === null || Array.isArray(adapter)) {
-        throw new Error('`adapter` must be an object.');
-    }
-
-    const adaptersMethods = Object.keys(adapter);
-    const allRequiredMethodsArePresent = requiredMethods.every(methodIsPresentIn(adaptersMethods));
-    const allMethodsAreFunctions = adaptersMethods.every((methodName) => isAFunction(adapter[methodName]));
-
-    if (!allRequiredMethodsArePresent) {
-        throw new Error('Not all required methods are present in adapter.');
-    }
-
-    if (!allMethodsAreFunctions) {
-        throw new Error('Not all required methods are functions.');
-    }
-}
-
-function validateArgs(args) {
-    if (typeof args !== 'object' || args === null || Array.isArray(args)) {
-        throw new Error('`args` must be an object.');
-    }
-
-    if (!args.cacheInstance) {
-        throw new Error('`args` must contain `cacheInstance` property.');
-    }
-}
-
-function validateMethodName(methodName) {
-    if (typeof methodName !== 'string') {
-        throw new Error('`methodName` must be a string.');
-    }
-}
+import { validateAdapter, validateArgs, validateExtra, validateMethodName } from './validation';
 
 function upperFirst(string) {
     const firstLetter = string[0];
@@ -140,6 +105,36 @@ export function createCache(adapter) {
             });
 
             return postData.item;
+        },
+
+        addExtra(key, extra) {
+            const preData = getPreData('addExtra', { cacheInstance: this, key, extra });
+
+            validateExtra(preData.extra);
+
+            const addedExtra =
+                this.hasItem(preData.key) ?
+                    adapter.addExtra(this.buildKey(preData.key), preData.extra) :
+                    undefined;
+            const postData = getPostData('addExtra', {
+                cacheInstance: preData.cacheInstance, key: preData.key, extra: addedExtra });
+
+            return postData.extra;
+        },
+
+        setExtra(key, extra) {
+            const preData = getPreData('setExtra', { cacheInstance: this, key, extra });
+
+            validateExtra(preData.extra);
+
+            const setExtra =
+                this.hasItem(preData.key) ?
+                    adapter.setExtra(this.buildKey(preData.key), preData.extra) :
+                    undefined;
+            const postData = getPostData('setExtra', {
+                cacheInstance: preData.cacheInstance, key: preData.key, extra: setExtra });
+
+            return postData.extra;
         },
 
         hasItem(key) {

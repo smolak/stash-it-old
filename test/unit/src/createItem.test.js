@@ -14,10 +14,8 @@ describe('createItem', () => {
         const expectedItem = {
             key,
             value,
-            extra: {
-                namespace,
-                some: 'extra'
-            }
+            namespace,
+            extra
         };
 
         expect(item).to.deep.eq(expectedItem);
@@ -29,9 +27,8 @@ describe('createItem', () => {
             const expectedItem = {
                 key,
                 value,
-                extra: {
-                    namespace
-                }
+                namespace,
+                extra: {}
             };
 
             expect(item).to.deep.eq(expectedItem);
@@ -44,9 +41,8 @@ describe('createItem', () => {
             const expectedItem = {
                 key,
                 value,
-                extra: {
-                    namespace
-                }
+                namespace,
+                extra: {}
             };
 
             expect(item).to.deep.eq(expectedItem);
@@ -62,14 +58,6 @@ describe('createItem', () => {
                     );
                 }
             });
-        });
-    });
-
-    context('when extra contains namespace property', () => {
-        it('should throw', () => {
-            expect(createItem.bind(null, key, value, namespace, { namespace: 'someNamespace' })).to.throw(
-                '`extra` can\'t contain `namespace` property.'
-            );
         });
     });
 });
