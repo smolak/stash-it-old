@@ -113,9 +113,9 @@ export function createCache(adapter) {
             validateExtra(preData.extra);
 
             const addedExtra =
-                this.hasItem(preData.key) ?
-                    adapter.addExtra(this.buildKey(preData.key), preData.extra) :
-                    undefined;
+                this.hasItem(preData.key)
+                    ? adapter.addExtra(this.buildKey(preData.key), preData.extra)
+                    : undefined;
             const postData = getPostData('addExtra', {
                 cacheInstance: preData.cacheInstance, key: preData.key, extra: addedExtra });
 
@@ -128,9 +128,9 @@ export function createCache(adapter) {
             validateExtra(preData.extra);
 
             const setExtra =
-                this.hasItem(preData.key) ?
-                    adapter.setExtra(this.buildKey(preData.key), preData.extra) :
-                    undefined;
+                this.hasItem(preData.key)
+                    ? adapter.setExtra(this.buildKey(preData.key), preData.extra)
+                    : undefined;
             const postData = getPostData('setExtra', {
                 cacheInstance: preData.cacheInstance, key: preData.key, extra: setExtra });
 
