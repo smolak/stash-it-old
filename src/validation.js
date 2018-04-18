@@ -40,3 +40,15 @@ export function validateExtra(extra) {
         throw new Error('`extra` must be an object.');
     }
 }
+
+export function validatePlugins(plugins) {
+    if (!Array.isArray(plugins)) {
+        throw new Error('`plugins` need to be passed as an array.');
+    }
+
+    plugins.forEach((plugin) => {
+        if (!plugin.hasOwnProperty('hooks') && !plugin.hasOwnProperty('getExtensions')) {
+            throw new Error('Plugin must contain hooks or getExtensions method or both.');
+        }
+    });
+}

@@ -1,4 +1,4 @@
-import { validateAdapter, validateArgs, validateExtra, validateMethodName } from './validation';
+import { validateAdapter, validateArgs, validateExtra, validateMethodName, validatePlugins } from './validation';
 
 function upperFirst(string) {
     const firstLetter = string[0];
@@ -155,6 +155,36 @@ export function createCache(adapter) {
             });
 
             return postData.result;
+        },
+
+        registerPlugins(plugins) {
+            validatePlugins(plugins);
+
+            plugins.forEach(({ hooks, getExtensions }) => {
+                if (hooks) {
+                    this.addHooks(hooks);
+                }
+
+                if (getExtensions) {
+                    if (typeof getExtensions !== 'function') {
+                        throw new Error('`getExtensions` must be a function.');
+                    }
+
+                    const createdExtensions = getExtensions(this);
+                    const extensionsNames = Object.keys(createdExtensions);
+                    const reservedNames = Object.keys(this);
+
+                    extensionsNames.forEach(extensionName => {
+                        const functionExists = reservedNames.some(reservedName => extensionName === reservedName);
+
+                        if (functionExists) {
+                            throw new Error(`Extension '${extensionName}' already exists.`);
+                        }
+                    });
+
+                    Object.assign(this, createdExtensions);
+                }
+            });
         }
     };
 }
