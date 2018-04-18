@@ -1,4 +1,11 @@
-import { validateAdapter, validateArgs, validateExtra, validateMethodName, validatePlugins } from './validation';
+import {
+    validateAdapter,
+    validateArgs,
+    validateExtensions,
+    validateExtra,
+    validateMethodName,
+    validatePlugins
+} from './validation';
 
 function upperFirst(string) {
     const firstLetter = string[0];
@@ -171,16 +178,8 @@ export function createCache(adapter) {
                     }
 
                     const extensionsFromPlugin = getExtensions(this);
-                    const extensionsNames = Object.keys(extensionsFromPlugin);
-                    const reservedNames = Object.keys(this);
 
-                    extensionsNames.forEach(extensionName => {
-                        const functionExists = reservedNames.some(reservedName => extensionName === reservedName);
-
-                        if (functionExists) {
-                            throw new Error(`Extension '${extensionName}' already exists.`);
-                        }
-                    });
+                    validateExtensions(extensionsFromPlugin, this);
 
                     Object.assign(this, extensionsFromPlugin);
                 }

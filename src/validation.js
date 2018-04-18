@@ -52,3 +52,16 @@ export function validatePlugins(plugins) {
         }
     });
 }
+
+export function validateExtensions(extensions, cacheInstance) {
+    const extensionsNames = Object.keys(extensions);
+    const reservedNames = Object.keys(cacheInstance);
+
+    extensionsNames.forEach(extensionName => {
+        const functionExists = reservedNames.some(reservedName => extensionName === reservedName);
+
+        if (functionExists) {
+            throw new Error(`Extension '${extensionName}' already exists.`);
+        }
+    });
+}
