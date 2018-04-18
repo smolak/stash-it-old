@@ -170,8 +170,8 @@ export function createCache(adapter) {
                         throw new Error('`getExtensions` must be a function.');
                     }
 
-                    const createdExtensions = getExtensions(this);
-                    const extensionsNames = Object.keys(createdExtensions);
+                    const extensionsFromPlugin = getExtensions(this);
+                    const extensionsNames = Object.keys(extensionsFromPlugin);
                     const reservedNames = Object.keys(this);
 
                     extensionsNames.forEach(extensionName => {
@@ -182,7 +182,7 @@ export function createCache(adapter) {
                         }
                     });
 
-                    Object.assign(this, createdExtensions);
+                    Object.assign(this, extensionsFromPlugin);
                 }
             });
         }
