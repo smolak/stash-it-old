@@ -1,8 +1,9 @@
 import {
+    createExtensionsValidator,
     validateAdapter,
     validateArgs,
-    validateExtensions,
     validateExtra,
+    validateGetExtensions,
     validateMethodName,
     validatePlugins
 } from './validation';
@@ -173,13 +174,12 @@ export function createCache(adapter) {
                 }
 
                 if (getExtensions) {
-                    if (typeof getExtensions !== 'function') {
-                        throw new Error('`getExtensions` must be a function.');
-                    }
+                    validateGetExtensions(getExtensions);
 
                     const extensionsFromPlugin = getExtensions(this);
+                    const extensionsValidator = createExtensionsValidator(this);
 
-                    validateExtensions(extensionsFromPlugin, this);
+                    extensionsValidator(extensionsFromPlugin);
 
                     Object.assign(this, extensionsFromPlugin);
                 }
