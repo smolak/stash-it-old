@@ -1,4 +1,12 @@
-import { validateAdapter, validateArgs, validateExtra, validateMethodName } from './validation';
+import {
+    createExtensionsValidator,
+    validateAdapter,
+    validateArgs,
+    validateExtra,
+    validateGetExtensions,
+    validateMethodName,
+    validatePlugins
+} from './validation';
 
 function upperFirst(string) {
     const firstLetter = string[0];
@@ -155,6 +163,29 @@ export function createCache(adapter) {
             });
 
             return postData.result;
+        },
+
+        registerPlugins(plugins) {
+            validatePlugins(plugins);
+
+            plugins.forEach(({ hooks }) => {
+                hooks ? this.addHooks(hooks) : null;
+            });
+
+            return plugins.reduce((instance, plugin) => {
+                if (plugin.getExtensions) {
+                    validateGetExtensions(plugin.getExtensions);
+
+                    const extensionsFromPlugin = plugin.getExtensions(instance);
+                    const extensionsValidator = createExtensionsValidator(instance);
+
+                    extensionsValidator(extensionsFromPlugin);
+
+                    return Object.assign({}, instance, extensionsFromPlugin);
+                }
+
+                return instance;
+            }, this);
         }
     };
 }

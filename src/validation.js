@@ -40,3 +40,36 @@ export function validateExtra(extra) {
         throw new Error('`extra` must be an object.');
     }
 }
+
+export function validatePlugins(plugins) {
+    if (!Array.isArray(plugins)) {
+        throw new Error('`plugins` need to be passed as an array.');
+    }
+
+    plugins.forEach((plugin) => {
+        if (!plugin.hasOwnProperty('hooks') && !plugin.hasOwnProperty('getExtensions')) {
+            throw new Error('Plugin must contain hooks or getExtensions method or both.');
+        }
+    });
+}
+
+export function createExtensionsValidator(cacheInstance) {
+    return function (extensions) {
+        const extensionsNames = Object.keys(extensions);
+        const reservedNames = Object.keys(cacheInstance);
+
+        extensionsNames.forEach(extensionName => {
+            const functionExists = reservedNames.some(reservedName => extensionName === reservedName);
+
+            if (functionExists) {
+                throw new Error(`Extension '${extensionName}' already exists.`);
+            }
+        });
+    };
+}
+
+export function validateGetExtensions(getExtensions) {
+    if (typeof getExtensions !== 'function') {
+        throw new Error('`getExtensions` must be a function.');
+    }
+}

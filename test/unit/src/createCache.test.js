@@ -43,7 +43,8 @@ describe('createCache', () => {
             'hasItem',
             'removeItem',
             'setItem',
-            'setExtra'
+            'setExtra',
+            'registerPlugins'
         ];
 
         expect(cache).to.have.all.keys(expectedMethods);
@@ -1379,6 +1380,118 @@ describe('createCache', () => {
                 expect(dummyAdapter.removeItem)
                     .to.have.been.calledWith(adapterBuiltKey)
                     .to.have.been.calledOnce;
+            });
+        });
+    });
+
+    describe('registerPlugins', () => {
+        const methods = {
+            foo: sinon.spy(),
+            bar: sinon.spy()
+        };
+        const getExtensionsStub = sinon.stub().returns(methods);
+        const plugin = {
+            getExtensions: getExtensionsStub,
+            hooks: []
+        };
+
+        beforeEach(() => {
+            sinon.spy(cache, 'addHooks');
+            getExtensionsStub.resetHistory();
+        });
+
+        afterEach(() => {
+            cache.addHooks.restore();
+        });
+
+        context('when plugins are not passed as an array', () => {
+            it('should throw', () => {
+                nonArrayValues.forEach((value) => {
+                    expect(cache.registerPlugins.bind(null, value))
+                        .to.throw('`plugins` need to be passed as an array.');
+                });
+            });
+        });
+
+        context('when there are no hooks and getExtension', () => {
+            it('should throw', () => {
+                const notAPlugin = {};
+
+                expect(cache.registerPlugins.bind(null, [ notAPlugin ]))
+                    .to.throw('Plugin must contain hooks or getExtensions method or both.');
+            });
+        });
+
+        it('should add hooks to cache instance', () => {
+            cache.registerPlugins([ plugin ]);
+
+            expect(cache.addHooks)
+                .to.have.been.calledWith(plugin.hooks)
+                .to.have.been.calledOnce;
+        });
+
+        context(`when plugin's getExtensions property is not present`, () => {
+            it('should return unchanged cache instance', () => {
+                const pluginWithHooksOnly = { hooks: [] };
+                const cacheWithPlugins = cache.registerPlugins([ pluginWithHooksOnly ]);
+
+                expect(cacheWithPlugins).to.equal(cache);
+            });
+        });
+
+        context(`when plugin's getExtensions property is not a function`, () => {
+            it('should throw', () => {
+                const nonNilValues = nonFunctionValues.filter((value) => {
+                    const result = [ null, undefined, false, 0 ].includes(value);
+
+                    return !result;
+                });
+
+                nonNilValues.forEach((value) => {
+                    const customPlugin = {
+                        getExtensions: value,
+                        hooks: []
+                    };
+
+                    expect(cache.registerPlugins.bind(cache, [ customPlugin ]))
+                        .to.throw('`getExtensions` must be a function.');
+                });
+            });
+        });
+
+        it('should return cache object extended by methods from plugins', () => {
+            const methods2 = {
+                bam: sinon.spy(),
+                baz: sinon.spy()
+            };
+            const plugin2 = {
+                getExtensions: () => methods2
+            };
+
+            const cacheWithPlugins = cache.registerPlugins([ plugin, plugin2 ]);
+
+            expect(cacheWithPlugins).to.have.property('foo');
+            expect(cacheWithPlugins).to.have.property('bar');
+            expect(cacheWithPlugins).to.have.property('baz');
+            expect(cacheWithPlugins).to.have.property('bam');
+
+            cacheWithPlugins.foo();
+            cacheWithPlugins.bar();
+            cacheWithPlugins.baz();
+            cacheWithPlugins.bam();
+
+            expect(methods.foo).to.have.been.calledOnce;
+            expect(methods.bar).to.have.been.calledOnce;
+            expect(methods2.baz).to.have.been.calledOnce;
+            expect(methods2.bam).to.have.been.calledOnce;
+        });
+
+        context('when method from plugin already exists in cache', () => {
+            it('should throw', () => {
+                const cacheWithPlugin = cache.registerPlugins([ plugin ]);
+
+                expect(cacheWithPlugin.registerPlugins.bind(cacheWithPlugin, [ plugin ]))
+                    .to.throw('Extension \'foo\' already exists.');
             });
         });
     });
