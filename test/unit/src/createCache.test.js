@@ -1431,19 +1431,11 @@ describe('createCache', () => {
         });
 
         context(`when plugin's getExtensions property is not present`, () => {
-            it('should not extend cache instance with any new properties', () => {
-                function clone(anObject) {
-                    const objectsPrototype = Object.getPrototypeOf(anObject);
-
-                    return Object.assign(Object.create(objectsPrototype), anObject);
-                }
-
+            it('should return unchanged cache instance', () => {
                 const pluginWithHooksOnly = { hooks: [] };
-                const clonedCache = clone(cache);
+                const cacheWithPlugins = cache.registerPlugins([ pluginWithHooksOnly ]);
 
-                cache.registerPlugins([ pluginWithHooksOnly ]);
-
-                expect(Object.keys(cache)).to.deep.equal(Object.keys(clonedCache));
+                expect(cacheWithPlugins).to.equal(cache);
             });
         });
 
@@ -1476,17 +1468,17 @@ describe('createCache', () => {
                 getExtensions: () => methods2
             };
 
-            cache.registerPlugins([ plugin, plugin2 ]);
+            const cacheWithPlugins = cache.registerPlugins([ plugin, plugin2 ]);
 
-            expect(cache).to.have.property('foo');
-            expect(cache).to.have.property('bar');
-            expect(cache).to.have.property('baz');
-            expect(cache).to.have.property('bam');
+            expect(cacheWithPlugins).to.have.property('foo');
+            expect(cacheWithPlugins).to.have.property('bar');
+            expect(cacheWithPlugins).to.have.property('baz');
+            expect(cacheWithPlugins).to.have.property('bam');
 
-            cache.foo();
-            cache.bar();
-            cache.baz();
-            cache.bam();
+            cacheWithPlugins.foo();
+            cacheWithPlugins.bar();
+            cacheWithPlugins.baz();
+            cacheWithPlugins.bam();
 
             expect(methods.foo).to.have.been.calledOnce;
             expect(methods.bar).to.have.been.calledOnce;
@@ -1496,9 +1488,9 @@ describe('createCache', () => {
 
         context('when method from plugin already exists in cache', () => {
             it('should throw', () => {
-                cache.registerPlugins([ plugin ]);
+                const cacheWithPlugin = cache.registerPlugins([ plugin ]);
 
-                expect(cache.registerPlugins.bind(cache, [ plugin ]))
+                expect(cacheWithPlugin.registerPlugins.bind(cacheWithPlugin, [ plugin ]))
                     .to.throw('Extension \'foo\' already exists.');
             });
         });

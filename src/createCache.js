@@ -168,22 +168,24 @@ export function createCache(adapter) {
         registerPlugins(plugins) {
             validatePlugins(plugins);
 
-            plugins.forEach(({ hooks, getExtensions }) => {
-                if (hooks) {
-                    this.addHooks(hooks);
-                }
+            plugins.forEach(({ hooks }) => {
+                hooks ? this.addHooks(hooks) : null;
+            });
 
-                if (getExtensions) {
-                    validateGetExtensions(getExtensions);
+            return plugins.reduce((instance, plugin) => {
+                if (plugin.getExtensions) {
+                    validateGetExtensions(plugin.getExtensions);
 
-                    const extensionsFromPlugin = getExtensions(this);
-                    const extensionsValidator = createExtensionsValidator(this);
+                    const extensionsFromPlugin = plugin.getExtensions(instance);
+                    const extensionsValidator = createExtensionsValidator(instance);
 
                     extensionsValidator(extensionsFromPlugin);
 
-                    Object.assign(this, extensionsFromPlugin);
+                    return Object.assign({}, instance, extensionsFromPlugin);
                 }
-            });
+
+                return instance;
+            }, this);
         }
     };
 }
