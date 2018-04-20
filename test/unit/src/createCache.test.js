@@ -1389,15 +1389,15 @@ describe('createCache', () => {
             foo: sinon.spy(),
             bar: sinon.spy()
         };
-        const getExtensionsStub = sinon.stub().returns(methods);
+        const createExtensionsStub = sinon.stub().returns(methods);
         const plugin = {
-            getExtensions: getExtensionsStub,
+            createExtensions: createExtensionsStub,
             hooks: []
         };
 
         beforeEach(() => {
             sinon.spy(cache, 'addHooks');
-            getExtensionsStub.resetHistory();
+            createExtensionsStub.resetHistory();
         });
 
         afterEach(() => {
@@ -1418,7 +1418,7 @@ describe('createCache', () => {
                 const notAPlugin = {};
 
                 expect(cache.registerPlugins.bind(null, [ notAPlugin ]))
-                    .to.throw('Plugin must contain hooks or getExtensions method or both.');
+                    .to.throw('Plugin must contain hooks or createExtensions method or both.');
             });
         });
 
@@ -1430,7 +1430,7 @@ describe('createCache', () => {
                 .to.have.been.calledOnce;
         });
 
-        context(`when plugin's getExtensions property is not present`, () => {
+        context(`when plugin's createExtensions property is not present`, () => {
             it('should return unchanged cache instance', () => {
                 const pluginWithHooksOnly = { hooks: [] };
                 const cacheWithPlugins = cache.registerPlugins([ pluginWithHooksOnly ]);
@@ -1439,7 +1439,7 @@ describe('createCache', () => {
             });
         });
 
-        context(`when plugin's getExtensions property is not a function`, () => {
+        context(`when plugin's createExtensions property is not a function`, () => {
             it('should throw', () => {
                 const nonNilValues = nonFunctionValues.filter((value) => {
                     const result = [ null, undefined, false, 0 ].includes(value);
@@ -1449,12 +1449,12 @@ describe('createCache', () => {
 
                 nonNilValues.forEach((value) => {
                     const customPlugin = {
-                        getExtensions: value,
+                        createExtensions: value,
                         hooks: []
                     };
 
                     expect(cache.registerPlugins.bind(cache, [ customPlugin ]))
-                        .to.throw('`getExtensions` must be a function.');
+                        .to.throw('`createExtensions` must be a function.');
                 });
             });
         });
@@ -1465,7 +1465,7 @@ describe('createCache', () => {
                 baz: sinon.spy()
             };
             const plugin2 = {
-                getExtensions: () => methods2
+                createExtensions: () => methods2
             };
 
             const cacheWithPlugins = cache.registerPlugins([ plugin, plugin2 ]);
