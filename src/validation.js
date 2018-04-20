@@ -68,7 +68,7 @@ export function createExtensionsValidator(cacheInstance) {
     };
 }
 
-export function validateCreateExtensions(createExtensions) {
+export function validateCreateExtensionsMethod(createExtensions) {
     if (typeof createExtensions !== 'function') {
         throw new Error('`createExtensions` must be a function.');
     }
