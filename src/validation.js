@@ -47,8 +47,8 @@ export function validatePlugins(plugins) {
     }
 
     plugins.forEach((plugin) => {
-        if (!plugin.hasOwnProperty('hooks') && !plugin.hasOwnProperty('getExtensions')) {
-            throw new Error('Plugin must contain hooks or getExtensions method or both.');
+        if (!plugin.hasOwnProperty('hooks') && !plugin.hasOwnProperty('createExtensions')) {
+            throw new Error('Plugin must contain hooks or createExtensions method or both.');
         }
     });
 }
@@ -68,8 +68,8 @@ export function createExtensionsValidator(cacheInstance) {
     };
 }
 
-export function validateGetExtensions(getExtensions) {
-    if (typeof getExtensions !== 'function') {
-        throw new Error('`getExtensions` must be a function.');
+export function validateCreateExtensionsMethod(createExtensions) {
+    if (typeof createExtensions !== 'function') {
+        throw new Error('`createExtensions` must be a function.');
     }
 }

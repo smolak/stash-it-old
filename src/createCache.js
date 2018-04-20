@@ -2,8 +2,8 @@ import {
     createExtensionsValidator,
     validateAdapter,
     validateArgs,
+    validateCreateExtensionsMethod,
     validateExtra,
-    validateGetExtensions,
     validateMethodName,
     validatePlugins
 } from './validation';
@@ -173,10 +173,10 @@ export function createCache(adapter) {
             });
 
             return plugins.reduce((instance, plugin) => {
-                if (plugin.getExtensions) {
-                    validateGetExtensions(plugin.getExtensions);
+                if (plugin.createExtensions) {
+                    validateCreateExtensionsMethod(plugin.createExtensions);
 
-                    const extensionsFromPlugin = plugin.getExtensions(instance);
+                    const extensionsFromPlugin = plugin.createExtensions(instance);
                     const extensionsValidator = createExtensionsValidator(instance);
 
                     extensionsValidator(extensionsFromPlugin);
