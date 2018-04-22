@@ -14,7 +14,7 @@
   "scripts": {
     "lint": "eslint --ext '.js' --ext '.md' --cache ./src",
     "lint:fix": "eslint --ext '.js' --ext '.md' --cache --fix ./src",
-    "prepare": "NODE_ENV=production babel src --presets babel-preset-es2015 --out-dir build",
+    "prepare": "NODE_ENV=production babel src --presets babel-preset-env --out-dir build",
     "test": "NODE_ENV=test nyc npm run test:unit && nyc check-coverage",
     "test:unit": "NODE_ENV=test mocha $(find src test -path '*.test.js') --opts test/unit/mocha.opts",
     "test:file": "NODE_ENV=test mocha --opts test/unit/mocha.opts --reporter spec -w "
@@ -32,7 +32,7 @@
     "babel-plugin-istanbul": "^4.1.6",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "chai": "^3.5.0",
     "eslint": "^4.19.1",
