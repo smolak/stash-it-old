@@ -329,7 +329,7 @@ describe('createCache', () => {
 
                 expect(returnedArgs === args).to.be.true;
                 expect(returnedArgs).to.deep.equal(args);
-                expect(spy).to.not.have.beenCalled;
+                expect(spy).to.not.have.been.called;
             });
         });
 
@@ -423,7 +423,7 @@ describe('createCache', () => {
 
                 expect(returnedArgs === args).to.be.true;
                 expect(returnedArgs).to.deep.equal(args);
-                expect(spy).to.not.have.beenCalled;
+                expect(spy).to.not.have.been.called;
             });
         });
 
@@ -524,8 +524,8 @@ describe('createCache', () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
                 const key = cache.buildKey(FOO_KEY);
 
-                expect(preStub).to.not.have.beenCalled;
-                expect(postStub).to.not.have.beenCalled;
+                expect(preStub).to.not.have.been.called;
+                expect(postStub).to.not.have.been.called;
 
                 expect(key).to.eq(adapterBuiltKey);
             });
@@ -625,8 +625,8 @@ describe('createCache', () => {
                 const expectedItem = createItem(adapterBuiltKey, FOO_VALUE, namespace);
                 const item = cache.getItem(FOO_KEY);
 
-                expect(preStub).to.not.have.beenCalled;
-                expect(postStub).to.not.have.beenCalled;
+                expect(preStub).to.not.have.been.called;
+                expect(postStub).to.not.have.been.called;
 
                 expect(item).to.deep.eq(expectedItem);
             });
@@ -729,8 +729,8 @@ describe('createCache', () => {
                 const expectedItem = createItem(adapterBuiltKey, FOO_VALUE, namespace);
                 const item = cache.getItem(FOO_KEY);
 
-                expect(preStub).to.not.have.beenCalled;
-                expect(postStub).to.not.have.beenCalled;
+                expect(preStub).to.not.have.been.called;
+                expect(postStub).to.not.have.been.called;
 
                 expect(item).to.deep.eq(expectedItem);
             });
@@ -836,8 +836,8 @@ describe('createCache', () => {
                 const expectedItem = createItem(adapterBuiltKey, FOO_VALUE, namespace);
                 const item = cache.setItem(FOO_KEY, FOO_VALUE);
 
-                expect(preStub).to.not.have.beenCalled;
-                expect(postStub).to.not.have.beenCalled;
+                expect(preStub).to.not.have.been.called;
+                expect(postStub).to.not.have.been.called;
 
                 expect(item).to.deep.eq(expectedItem);
             });
@@ -1003,8 +1003,8 @@ describe('createCache', () => {
             it('should set extra without passing data through pre/post event handlers', () => {
                 const setExtra = cache.setExtra(FOO_KEY, FOO_EXTRA);
 
-                expect(preStub).to.not.have.beenCalled;
-                expect(postStub).to.not.have.beenCalled;
+                expect(preStub).to.not.have.been.called;
+                expect(postStub).to.not.have.been.called;
 
                 expect(setExtra).to.deep.eq(FOO_EXTRA);
             });
@@ -1170,8 +1170,8 @@ describe('createCache', () => {
             it('should set extra without passing data through pre/post event handlers', () => {
                 const addedExtra = cache.addExtra(FOO_KEY, FOO_EXTRA);
 
-                expect(preStub).to.not.have.beenCalled;
-                expect(postStub).to.not.have.beenCalled;
+                expect(preStub).to.not.have.been.called;
+                expect(postStub).to.not.have.been.called;
 
                 expect(addedExtra).to.deep.eq(FOO_EXTRA);
             });
@@ -1268,8 +1268,8 @@ describe('createCache', () => {
             it('should check item\'s existence without passing data through pre/post event handlers', () => {
                 const result = cache.hasItem(FOO_KEY);
 
-                expect(preStub).to.not.have.beenCalled;
-                expect(postStub).to.not.have.beenCalled;
+                expect(preStub).to.not.have.been.called;
+                expect(postStub).to.not.have.been.called;
 
                 expect(result).to.be.true;
             });
@@ -1366,8 +1366,8 @@ describe('createCache', () => {
             it('should remove item without passing data through pre/post event handlers', () => {
                 const result = cache.removeItem(FOO_KEY);
 
-                expect(preStub).to.not.have.beenCalled;
-                expect(postStub).to.not.have.beenCalled;
+                expect(preStub).to.not.have.been.called;
+                expect(postStub).to.not.have.been.called;
 
                 expect(result).to.be.true;
             });
