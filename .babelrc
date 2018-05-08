@@ -1,23 +1,14 @@
 {
     "presets": [ "env" ],
-    "plugins": [
-        "transform-object-rest-spread"
-    ],
     "env": {
         "test": {
             "plugins": [
-                "transform-object-rest-spread",
                 ["istanbul", {
                     "exclude": [
                         "**/*.test.*",
                         "test/**"
                     ]
                 }]
-            ]
-        },
-        "production": {
-            "plugins": [
-                "transform-object-rest-spread"
             ]
         }
     }
