@@ -1,6 +1,6 @@
 {
   "name": "stash-it",
-  "version": "2.0.0",
+  "version": "3.0.0-rc.1",
   "description": "Cache mechanism based on plugins.",
   "author": "Jacek Smolak <jacek.smolak@gmail.com>",
   "main": "build/index.js",
