@@ -26,7 +26,7 @@
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-istanbul": "^4.1.6",
@@ -39,9 +39,9 @@
     "eslint-plugin-markdown": "^1.0.0-beta.8",
     "eslint-plugin-mocha": "^4.12.1",
     "mocha": "^4.1.0",
-    "nyc": "^11.7.0",
+    "nyc": "^11.7.1",
     "ramda": "^0.25.0",
-    "sinon": "^4.5.0",
+    "sinon": "^5.0.7",
     "sinon-chai": "^2.14.0",
     "stash-it-test-helpers": "^1.5.1"
   }
