@@ -1498,5 +1498,12 @@ describe('createCache', () => {
                     .to.throw('Extension \'foo\' already exists.');
             });
         });
+
+        context('when plugins that contain methods of the same name are registered', () => {
+            it('should throw', () => {
+                expect(cache.registerPlugins.bind(cache, [ plugin, plugin ]))
+                    .to.throw('Extension \'foo\' already exists.');
+            });
+        });
     });
 });
