@@ -41,7 +41,9 @@ export const getPostData = (methodName, args) => {
     return passDataThroughHooks(hooks, event, args);
 };
 
-const requiredMethods = [ 'buildKey', 'getItem', 'getExtra', 'setItem', 'hasItem', 'removeItem' ];
+const requiredMethods = [
+    'buildKey', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
+];
 
 export function createCache(adapter) {
     validateAdapter(adapter, requiredMethods);

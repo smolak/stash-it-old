@@ -60,7 +60,9 @@ describe('createCache', () => {
 
     context('when not all required methods are present', () => {
         it('should throw', () => {
-            const requiredMethods = [ 'buildKey', 'getItem', 'getExtra', 'setItem', 'hasItem', 'removeItem' ];
+            const requiredMethods = [
+                'buildKey', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
+            ];
 
             requiredMethods.forEach((methodName, index) => {
                 const allMethodsButOne = R.remove(index, 1, requiredMethods);
@@ -77,7 +79,9 @@ describe('createCache', () => {
 
     context('when not all required methods are functions', () => {
         it('should throw', () => {
-            const requiredMethods = [ 'buildKey', 'getItem', 'getExtra', 'setItem', 'hasItem', 'removeItem' ];
+            const requiredMethods = [
+                'buildKey', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
+            ];
 
             requiredMethods.forEach((methodName, index) => {
                 const allMethodsButOne = R.remove(index, 1, requiredMethods);
