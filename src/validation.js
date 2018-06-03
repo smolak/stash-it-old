@@ -73,3 +73,23 @@ export function validateCreateExtensionsMethod(createExtensions) {
         throw new Error('`createExtensions` must be a function.');
     }
 }
+
+export function validateHooks(hooks) {
+    if (!Array.isArray(hooks)) {
+        throw new Error('Hooks need to be passed as an array.');
+    }
+}
+
+export function validateHook({ event, handler }) {
+    if (typeof event !== 'string') {
+        throw new Error('Hook\'s event must be a string.');
+    }
+
+    if (!event.startsWith('pre') && !event.startsWith('post')) {
+        throw new Error('Hook\'s event must start with `pre` or `post`.');
+    }
+
+    if (typeof handler !== 'function') {
+        throw new Error('Hook\'s handler must be a function.');
+    }
+}

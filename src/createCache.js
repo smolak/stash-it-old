@@ -4,6 +4,8 @@ import {
     validateArgs,
     validateCreateExtensionsMethod,
     validateExtra,
+    validateHook,
+    validateHooks,
     validateMethodName,
     validatePlugins
 } from './validation';
@@ -51,26 +53,16 @@ export function createCache(adapter) {
     const hooks = {};
 
     return {
-        addHook({ event, handler }) {
-            if (typeof event !== 'string') {
-                throw new Error('Hook\'s event must be a string.');
-            }
+        addHook(hook) {
+            validateHook(hook);
 
-            if (!event.startsWith('pre') && !event.startsWith('post')) {
-                throw new Error('Hook\'s event must start with `pre` or `post`.');
-            }
-
-            if (typeof handler !== 'function') {
-                throw new Error('Hook\'s handler must be a function.');
-            }
+            const { event, handler } = hook;
 
             hooks[event] ? hooks[event].push(handler) : (hooks[event] = [handler]);
         },
 
         addHooks(hooks) {
-            if (!Array.isArray(hooks)) {
-                throw new Error('Hooks need to be passed as an array.');
-            }
+            validateHooks(hooks);
 
             hooks.forEach(this.addHook);
         },
