@@ -14,7 +14,7 @@
   "scripts": {
     "lint": "eslint --ext '.js' --ext '.md' --cache ./src",
     "lint:fix": "eslint --ext '.js' --ext '.md' --cache --fix ./src",
-    "prepare": "NODE_ENV=production babel src --presets babel-preset-env --out-dir build",
+    "prepare": "NODE_ENV=production babel src --presets @babel/preset-env --out-dir build",
     "test": "NODE_ENV=test nyc npm run test:unit && nyc check-coverage",
     "test:unit": "NODE_ENV=test mocha $(find src test -path '*.test.js') --opts test/unit/mocha.opts",
     "test:file": "NODE_ENV=test mocha --opts test/unit/mocha.opts --reporter spec -w "
@@ -25,10 +25,11 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
+    "@babel/cli": "^7.0.0-beta.49",
+    "@babel/core": "^7.0.0-beta.49",
+    "@babel/preset-env": "^7.0.0-beta.49",
+    "@babel/register": "^7.0.0-beta.49",
     "babel-plugin-istanbul": "^4.1.6",
-    "babel-preset-env": "^1.7.0",
-    "babel-register": "^6.26.0",
     "chai": "^4.1.2",
     "eslint": "^4.19.1",
     "eslint-plugin-import": "^2.12.0",
