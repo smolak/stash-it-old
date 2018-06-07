@@ -93,3 +93,13 @@ export function validateHook({ event, handler }) {
         throw new Error('Hook\'s handler must be a function.');
     }
 }
+
+export function validateNamespace(namespace) {
+    if (typeof namespace !== 'string') {
+        throw new Error('`namespace` must be a string.');
+    }
+
+    if (false === /^[A-Za-z0-9_-]+$/i.test(namespace)) {
+        throw Error('`namespace` can contain only letters, numbers, `_` or `-`.');
+    }
+}

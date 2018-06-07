@@ -8,6 +8,7 @@ import {
     FOO_WITH_EXTRA_KEY,
     FOO_EXTRA,
     NONEXISTENT_KEY,
+    invalidCharacters,
     nonArrayValues,
     nonFunctionValues,
     nonObjectValues,
@@ -24,8 +25,8 @@ describe('createCache', () => {
     let dummyAdapter;
 
     beforeEach(() => {
-        dummyAdapter = createDummyAdapter(createItem, { namespace });
-        cache = createCache(dummyAdapter);
+        dummyAdapter = createDummyAdapter(createItem);
+        cache = createCache(dummyAdapter, namespace);
     });
 
     it('should create cache object', () => {
@@ -92,19 +93,39 @@ describe('createCache', () => {
         });
     });
 
+    describe('namespace', () => {
+        context('when namespace is not of string type', () => {
+            it('should throw', () => {
+                nonStringValues.forEach((namespace) => {
+                    expect(createCache.bind(null, dummyAdapter, namespace)).to.throw('`namespace` must be a string.');
+                });
+            });
+        });
+
+        context('when namespace contains invalid characters', () => {
+            it('should throw', () => {
+                invalidCharacters.forEach((namespace) => {
+                    expect(createCache.bind(null, dummyAdapter, namespace)).to.throw(
+                        '`namespace` can contain only letters, numbers, `_` or `-`.'
+                    );
+                });
+            });
+        });
+    });
+
     describe('hooks', () => {
         it('should have empty hooks by default', () => {
             expect(cache.getHooks()).to.deep.eq({});
         });
 
         it('should not share hooks between different instances of created cache', () => {
-            const cache1 = createCache(dummyAdapter);
-            const cache2 = createCache(dummyAdapter);
+            const cache1 = createCache(dummyAdapter, namespace);
+            const cache2 = createCache(dummyAdapter, namespace);
 
             cache1.addHook({ event: 'preSomething', handler: () => {} });
             cache2.addHook({ event: 'postSomething', handler: () => {} });
 
-            const cache3 = createCache(dummyAdapter);
+            const cache3 = createCache(dummyAdapter, namespace);
 
             const hooks1 = cache1.getHooks();
             const hooks2 = cache2.getHooks();
@@ -259,7 +280,7 @@ describe('createCache', () => {
     });
 
     describe('getNamespace', () => {
-        it('should return namespace set in adapter', () => {
+        it('should return namespace', () => {
             const returnedNamespace = cache.getNamespace();
 
             expect(returnedNamespace).to.equal('namespace');

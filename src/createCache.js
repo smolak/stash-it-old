@@ -7,6 +7,7 @@ import {
     validateHook,
     validateHooks,
     validateMethodName,
+    validateNamespace,
     validatePlugins
 } from './validation';
 import requiredMethods from './requiredMethods';
@@ -44,8 +45,9 @@ export const getPostData = (methodName, args) => {
     return passDataThroughHooks(hooks, event, args);
 };
 
-export function createCache(adapter) {
+export function createCache(adapter, namespace) {
     validateAdapter(adapter, requiredMethods);
+    validateNamespace(namespace);
 
     const hooks = {};
 
@@ -69,7 +71,7 @@ export function createCache(adapter) {
         },
 
         getNamespace() {
-            return adapter.getNamespace();
+            return namespace;
         },
 
         buildKey(key) {
