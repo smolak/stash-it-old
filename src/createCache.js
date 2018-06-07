@@ -9,6 +9,7 @@ import {
     validateMethodName,
     validatePlugins
 } from './validation';
+import requiredMethods from './requiredMethods';
 
 function upperFirst(string) {
     const firstLetter = string[0];
@@ -42,10 +43,6 @@ export const getPostData = (methodName, args) => {
 
     return passDataThroughHooks(hooks, event, args);
 };
-
-const requiredMethods = [
-    'buildKey', 'getNamespace', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
-];
 
 export function createCache(adapter) {
     validateAdapter(adapter, requiredMethods);

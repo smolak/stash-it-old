@@ -16,6 +16,7 @@ import {
 
 import createItem from '../../../src/createItem';
 import { createCache, getPreData, getPostData } from '../../../src/createCache';
+import requiredMethods from '../../../src/requiredMethods';
 
 describe('createCache', () => {
     const namespace = 'namespace';
@@ -61,10 +62,6 @@ describe('createCache', () => {
 
     context('when not all required methods are present', () => {
         it('should throw', () => {
-            const requiredMethods = [
-                'buildKey', 'getNamespace', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
-            ];
-
             requiredMethods.forEach((methodName, index) => {
                 const allMethodsButOne = R.remove(index, 1, requiredMethods);
                 const adapterDouble = {};
@@ -80,10 +77,6 @@ describe('createCache', () => {
 
     context('when not all required methods are functions', () => {
         it('should throw', () => {
-            const requiredMethods = [
-                'buildKey', 'getNamespace', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
-            ];
-
             requiredMethods.forEach((methodName, index) => {
                 const allMethodsButOne = R.remove(index, 1, requiredMethods);
                 const adapterDouble = {
