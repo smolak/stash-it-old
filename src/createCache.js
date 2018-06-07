@@ -44,7 +44,7 @@ export const getPostData = (methodName, args) => {
 };
 
 const requiredMethods = [
-    'buildKey', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
+    'buildKey', 'getNamespace', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
 ];
 
 export function createCache(adapter) {
@@ -69,6 +69,10 @@ export function createCache(adapter) {
 
         getHooks() {
             return hooks;
+        },
+
+        getNamespace() {
+            return adapter.getNamespace();
         },
 
         buildKey(key) {

@@ -40,6 +40,7 @@ describe('createCache', () => {
             'getExtra',
             'getHooks',
             'getItem',
+            'getNamespace',
             'hasItem',
             'removeItem',
             'setItem',
@@ -61,7 +62,7 @@ describe('createCache', () => {
     context('when not all required methods are present', () => {
         it('should throw', () => {
             const requiredMethods = [
-                'buildKey', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
+                'buildKey', 'getNamespace', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
             ];
 
             requiredMethods.forEach((methodName, index) => {
@@ -80,7 +81,7 @@ describe('createCache', () => {
     context('when not all required methods are functions', () => {
         it('should throw', () => {
             const requiredMethods = [
-                'buildKey', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
+                'buildKey', 'getNamespace', 'getItem', 'getExtra', 'setItem', 'addExtra', 'setExtra', 'hasItem', 'removeItem'
             ];
 
             requiredMethods.forEach((methodName, index) => {
@@ -261,6 +262,14 @@ describe('createCache', () => {
 
                 expect(cache.getHooks()).to.deep.eq(expectedHooks);
             });
+        });
+    });
+
+    describe('getNamespace', () => {
+        it('should return namespace set in adapter', () => {
+            const returnedNamespace = cache.getNamespace();
+
+            expect(returnedNamespace).to.equal('namespace');
         });
     });
 
