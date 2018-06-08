@@ -1,12 +1,11 @@
 import { validateExtra } from './validation';
 
-export default function createItem(key, value, namespace, extra = {}) {
+export default function createItem(key, value, extra = {}) {
     validateExtra(extra);
 
     return {
         key,
         value,
-        namespace,
         extra
     };
 }

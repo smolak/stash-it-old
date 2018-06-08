@@ -20,13 +20,12 @@ import { createCache, getPreData, getPostData } from '../../../src/createCache';
 import requiredMethods from '../../../src/requiredMethods';
 
 describe('createCache', () => {
-    const namespace = 'namespace';
     let cache;
     let dummyAdapter;
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
-        cache = createCache(dummyAdapter, namespace);
+        cache = createCache(dummyAdapter);
     });
 
     it('should create cache object', () => {
@@ -42,7 +41,6 @@ describe('createCache', () => {
             'getExtra',
             'getHooks',
             'getItem',
-            'getNamespace',
             'hasItem',
             'removeItem',
             'setItem',
@@ -93,39 +91,19 @@ describe('createCache', () => {
         });
     });
 
-    describe('namespace', () => {
-        context('when namespace is not of string type', () => {
-            it('should throw', () => {
-                nonStringValues.forEach((namespace) => {
-                    expect(createCache.bind(null, dummyAdapter, namespace)).to.throw('`namespace` must be a string.');
-                });
-            });
-        });
-
-        context('when namespace contains invalid characters', () => {
-            it('should throw', () => {
-                invalidCharacters.forEach((namespace) => {
-                    expect(createCache.bind(null, dummyAdapter, namespace)).to.throw(
-                        '`namespace` can contain only letters, numbers, `_` or `-`.'
-                    );
-                });
-            });
-        });
-    });
-
     describe('hooks', () => {
         it('should have empty hooks by default', () => {
             expect(cache.getHooks()).to.deep.eq({});
         });
 
         it('should not share hooks between different instances of created cache', () => {
-            const cache1 = createCache(dummyAdapter, namespace);
-            const cache2 = createCache(dummyAdapter, namespace);
+            const cache1 = createCache(dummyAdapter);
+            const cache2 = createCache(dummyAdapter);
 
             cache1.addHook({ event: 'preSomething', handler: () => {} });
             cache2.addHook({ event: 'postSomething', handler: () => {} });
 
-            const cache3 = createCache(dummyAdapter, namespace);
+            const cache3 = createCache(dummyAdapter);
 
             const hooks1 = cache1.getHooks();
             const hooks2 = cache2.getHooks();
@@ -276,14 +254,6 @@ describe('createCache', () => {
 
                 expect(cache.getHooks()).to.deep.eq(expectedHooks);
             });
-        });
-    });
-
-    describe('getNamespace', () => {
-        it('should return namespace', () => {
-            const returnedNamespace = cache.getNamespace();
-
-            expect(returnedNamespace).to.equal('namespace');
         });
     });
 
@@ -586,7 +556,7 @@ describe('createCache', () => {
 
         it('should get item using adapter\'s getItem method', () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-            const expectedItem = createItem(adapterBuiltKey, FOO_VALUE, namespace);
+            const expectedItem = createItem(adapterBuiltKey, FOO_VALUE);
             const item = cache.getItem(FOO_KEY);
 
             expect(item).to.deep.eq(expectedItem);
@@ -611,7 +581,7 @@ describe('createCache', () => {
 
             it('should pass data through that hook\'s handlers', () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-                const item = createItem(adapterBuiltKey, FOO_VALUE, namespace);
+                const item = createItem(adapterBuiltKey, FOO_VALUE);
                 const expectedPreArgs = {
                     cacheInstance: cache,
                     key: FOO_KEY
@@ -649,7 +619,7 @@ describe('createCache', () => {
         context('when there are no hooks for pre/post events', () => {
             it('should get item without passing data through pre/post event handlers', () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-                const expectedItem = createItem(adapterBuiltKey, FOO_VALUE, namespace);
+                const expectedItem = createItem(adapterBuiltKey, FOO_VALUE);
                 const item = cache.getItem(FOO_KEY);
 
                 expect(preStub).to.not.have.been.called;
@@ -689,7 +659,7 @@ describe('createCache', () => {
 
         it('should get extra using adapter\'s getExtra method', () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-            const item = createItem(adapterBuiltKey, FOO_VALUE, namespace);
+            const item = createItem(adapterBuiltKey, FOO_VALUE);
             const extra = cache.getExtra(FOO_KEY);
 
             expect(extra).to.deep.eq(item.extra);
@@ -714,7 +684,7 @@ describe('createCache', () => {
 
             it('should pass data through that hook\'s handlers', () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-                const item = createItem(adapterBuiltKey, FOO_VALUE, namespace);
+                const item = createItem(adapterBuiltKey, FOO_VALUE);
                 const extra = item.extra;
                 const expectedPreArgs = {
                     cacheInstance: cache,
@@ -753,7 +723,7 @@ describe('createCache', () => {
         context('when there are no hooks for pre/post events', () => {
             it('should get item without passing data through pre/post event handlers', () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-                const expectedItem = createItem(adapterBuiltKey, FOO_VALUE, namespace);
+                const expectedItem = createItem(adapterBuiltKey, FOO_VALUE);
                 const item = cache.getItem(FOO_KEY);
 
                 expect(preStub).to.not.have.been.called;
@@ -793,7 +763,7 @@ describe('createCache', () => {
 
         it('should set item using adapter\'s setItem method', () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_WITH_EXTRA_KEY);
-            const item = createItem(adapterBuiltKey, FOO_VALUE, namespace, FOO_EXTRA);
+            const item = createItem(adapterBuiltKey, FOO_VALUE, FOO_EXTRA);
             const setItem = cache.setItem(FOO_WITH_EXTRA_KEY, FOO_VALUE, FOO_EXTRA);
 
             expect(setItem).to.deep.eq(item);
@@ -818,7 +788,7 @@ describe('createCache', () => {
 
             it('should pass data through that hook\'s handlers', () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_WITH_EXTRA_KEY);
-                const item = createItem(adapterBuiltKey, FOO_VALUE, namespace, FOO_EXTRA);
+                const item = createItem(adapterBuiltKey, FOO_VALUE, FOO_EXTRA);
                 const expectedPreArgs = {
                     cacheInstance: cache,
                     extra: FOO_EXTRA,
@@ -860,7 +830,7 @@ describe('createCache', () => {
         context('when there are no hooks for pre/post events', () => {
             it('should set item without passing data through pre/post event handlers', () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY, FOO_VALUE);
-                const expectedItem = createItem(adapterBuiltKey, FOO_VALUE, namespace);
+                const expectedItem = createItem(adapterBuiltKey, FOO_VALUE);
                 const item = cache.setItem(FOO_KEY, FOO_VALUE);
 
                 expect(preStub).to.not.have.been.called;
