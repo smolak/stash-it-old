@@ -1,6 +1,7 @@
-import { validateExtra } from './validation';
+import { validateKey, validateExtra } from './validation';
 
 export default function createItem(key, value, extra = {}) {
+    validateKey(key);
     validateExtra(extra);
 
     return {

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { nonObjectValues } from 'stash-it-test-helpers';
+import { nonObjectValues, nonStringValues } from 'stash-it-test-helpers';
 
 import createItem from '../../../src/createItem';
 
@@ -17,6 +17,18 @@ describe('createItem', () => {
         };
 
         expect(item).to.deep.eq(expectedItem);
+    });
+
+    context('when key is not of string type', () => {
+        it('should throw', () => {
+            nonStringValues.forEach((nonStringValue) => {
+                if (nonStringValue !== undefined) {
+                    expect(createItem.bind(null, nonStringValue, value)).to.throw(
+                        '`key` must be a string.'
+                    );
+                }
+            });
+        });
     });
 
     context('when extra is not passed', () => {
