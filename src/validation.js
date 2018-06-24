@@ -41,6 +41,12 @@ export function validateExtra(extra) {
     }
 }
 
+export function validateKey(key) {
+    if (typeof key !== 'string') {
+        throw new Error('`key` must be a string.');
+    }
+}
+
 export function validatePlugins(plugins) {
     if (!Array.isArray(plugins)) {
         throw new Error('`plugins` need to be passed as an array.');
