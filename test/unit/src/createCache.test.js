@@ -8,7 +8,6 @@ import {
     FOO_WITH_EXTRA_KEY,
     FOO_EXTRA,
     NONEXISTENT_KEY,
-    invalidCharacters,
     nonArrayValues,
     nonFunctionValues,
     nonObjectValues,
