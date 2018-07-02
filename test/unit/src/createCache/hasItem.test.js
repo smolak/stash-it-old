@@ -15,6 +15,7 @@ describe('hasItem method', () => {
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
         cache = createCache(dummyAdapter);
+
         preStub.resetHistory();
         postStub.resetHistory();
     });
