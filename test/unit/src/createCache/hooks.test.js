@@ -45,15 +45,15 @@ describe('hooks', () => {
             it('should throw', () => {
                 nonStringValues.forEach((value) => {
                     expect(cache.addHook.bind(null, { event: value }))
-                        .to.throw('Hook\'s event must be a string.');
+                        .to.throw(`Hook's event must be a string.`);
                 });
             });
         });
 
-        context('when event doesn\'t start with `pre` or `post`', () => {
+        context("when event doesn't start with 'pre' or 'post'", () => {
             it('should throw', () => {
                 expect(cache.addHook.bind(null, { event: 'someEvent' }))
-                    .to.throw('Hook\'s event must start with `pre` or `post`.');
+                    .to.throw("Hook's event must start with 'pre' or 'post'.");
             });
         });
 
@@ -61,7 +61,7 @@ describe('hooks', () => {
             it('should throw', () => {
                 nonFunctionValues.forEach((value) => {
                     expect(cache.addHook.bind(null, { event: 'preSomething', handler: value }))
-                        .to.throw('Hook\'s handler must be a function.');
+                        .to.throw(`Hook's handler must be a function.`);
                 });
             });
         });

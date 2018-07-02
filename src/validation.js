@@ -92,7 +92,7 @@ export function validateHook({ event, handler }) {
     }
 
     if (!event.startsWith('pre') && !event.startsWith('post')) {
-        throw new Error('Hook\'s event must start with `pre` or `post`.');
+        throw new Error("Hook's event must start with 'pre' or 'post'.");
     }
 
     if (typeof handler !== 'function') {
