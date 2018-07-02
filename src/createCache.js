@@ -49,7 +49,7 @@ export function createCache(adapter) {
 
     const hooks = {};
 
-    return {
+    const cacheInstance = {
         addHook(hook) {
             validateHook(hook);
 
@@ -172,11 +172,18 @@ export function createCache(adapter) {
 
                     extensionsValidator(extensionsFromPlugin);
 
-                    return Object.assign({}, instance, extensionsFromPlugin);
+                    const extendedCacheInstance = Object.assign({}, instance, extensionsFromPlugin);
+                    const freezedCacheInstance = Object.freeze(extendedCacheInstance);
+
+                    return freezedCacheInstance;
                 }
 
                 return instance;
             }, this);
         }
     };
+
+    const freezedCacheInstance = Object.freeze(cacheInstance);
+
+    return freezedCacheInstance;
 }

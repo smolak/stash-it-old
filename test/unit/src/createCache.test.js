@@ -20,6 +20,21 @@ import { createCache, getPreData, getPostData } from '../../../src/createCache';
 import requiredMethods from '../../../src/requiredMethods';
 
 describe('createCache', () => {
+    const expectedMethods = [
+        'addExtra',
+        'addHook',
+        'addHooks',
+        'buildKey',
+        'getExtra',
+        'getHooks',
+        'getItem',
+        'hasItem',
+        'removeItem',
+        'setItem',
+        'setExtra',
+        'registerPlugins'
+    ];
+
     let cache;
     let dummyAdapter;
 
@@ -33,21 +48,6 @@ describe('createCache', () => {
     });
 
     it('should create cache object with all methods', () => {
-        const expectedMethods = [
-            'addExtra',
-            'addHook',
-            'addHooks',
-            'buildKey',
-            'getExtra',
-            'getHooks',
-            'getItem',
-            'hasItem',
-            'removeItem',
-            'setItem',
-            'setExtra',
-            'registerPlugins'
-        ];
-
         expect(cache).to.have.all.keys(expectedMethods);
     });
 
@@ -1484,6 +1484,33 @@ describe('createCache', () => {
             expect(methods.bar).to.have.been.calledOnce;
             expect(methods2.baz).to.have.been.calledOnce;
             expect(methods2.bam).to.have.been.calledOnce;
+        });
+
+        it('should return freezed cache object', () => {
+            const cacheWithPlugins = cache.registerPlugins([ plugin ]);
+
+            expectedMethods.forEach((methodName) => {
+                try {
+                    delete cacheWithPlugins[methodName];
+                } catch(e) {}
+
+                expect(cacheWithPlugins[methodName]).to.be.ok;
+            });
+        });
+
+        context(`when plugin doesn't extend cache instance with new methods`, () => {
+            it('should return freezed cache object', () => {
+                const pluginWithHooksOnly = { hooks: [] };
+                const cacheWithPlugins = cache.registerPlugins([ pluginWithHooksOnly ]);
+
+                expectedMethods.forEach((methodName) => {
+                    try {
+                        delete cacheWithPlugins[methodName];
+                    } catch(e) {}
+
+                    expect(cacheWithPlugins[methodName]).to.be.ok;
+                });
+            });
         });
 
         context('when method from plugin already exists in cache', () => {
