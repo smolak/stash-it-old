@@ -1387,18 +1387,19 @@ describe('createCache', () => {
             bar: sinon.spy()
         };
         const createExtensionsStub = sinon.stub().returns(methods);
+        const preSomeActionEventHandler = () => {};
         const plugin = {
             createExtensions: createExtensionsStub,
-            hooks: []
+            hooks: [
+                {
+                    event: 'preSomeAction',
+                    handler: preSomeActionEventHandler
+                }
+            ]
         };
 
         beforeEach(() => {
-            sinon.spy(cache, 'addHooks');
             createExtensionsStub.resetHistory();
-        });
-
-        afterEach(() => {
-            cache.addHooks.restore();
         });
 
         context('when plugins are not passed as an array', () => {
@@ -1422,9 +1423,11 @@ describe('createCache', () => {
         it('should add hooks to cache instance', () => {
             cache.registerPlugins([ plugin ]);
 
-            expect(cache.addHooks)
-                .to.have.been.calledWith(plugin.hooks)
-                .to.have.been.calledOnce;
+            const expectedRegisteredHooks = {
+                preSomeAction: [ preSomeActionEventHandler ]
+            };
+
+            expect(cache.getHooks()).to.deep.equal(expectedRegisteredHooks);
         });
 
         context(`when plugin's createExtensions property is not present`, () => {
