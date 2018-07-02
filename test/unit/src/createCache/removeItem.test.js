@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {expect} from 'chai';
+import { expect } from 'chai';
 import { createDummyAdapter, FOO_KEY } from 'stash-it-test-helpers';
 
 import createItem from '../../../../src/createItem';
