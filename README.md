@@ -47,7 +47,7 @@ import { createCache } from 'stash-it';
 import createMemoryAdapter from 'stash-it-adapter-memory';
 
 // First, we need to create an adapter
-const adapter = createMemoryAdapter({ namespace: 'someNamespace' });
+const adapter = createMemoryAdapter();
 
 // Now, let's create cache instance
 const cache = createCache(adapter);
@@ -66,7 +66,10 @@ cache.hasItem('key'); // false
 
 And that's pretty much it.
 
-**Important:** if you want to use stash-it in browser, you need to use some kind of bundler, e.g. [webpack](https://webpack.github.io/).
+### Important
+
+**stash-it** is build in **ES6** for modern environments. If you need to run it in older ones,
+you will have to transpile it. See `.babelrc` file for more details.
 
 ### Documentation
 
