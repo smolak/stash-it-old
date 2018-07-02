@@ -3,7 +3,7 @@ const isAFunction = (something) => typeof something === 'function';
 
 export function validateAdapter(adapter, requiredMethods) {
     if (typeof adapter !== 'object' || adapter === null || Array.isArray(adapter)) {
-        throw new Error('`adapter` must be an object.');
+        throw new Error("'adapter' must be an object.");
     }
 
     const adaptersMethods = Object.keys(adapter);
@@ -21,35 +21,35 @@ export function validateAdapter(adapter, requiredMethods) {
 
 export function validateArgs(args) {
     if (typeof args !== 'object' || args === null || Array.isArray(args)) {
-        throw new Error('`args` must be an object.');
+        throw new Error("'args' must be an object.");
     }
 
     if (!args.cacheInstance) {
-        throw new Error('`args` must contain `cacheInstance` property.');
+        throw new Error("'args' must contain 'cacheInstance' property.");
     }
 }
 
 export function validateMethodName(methodName) {
     if (typeof methodName !== 'string') {
-        throw new Error('`methodName` must be a string.');
+        throw new Error("'methodName' must be a string.");
     }
 }
 
 export function validateExtra(extra) {
     if (typeof extra !== 'object' || extra === null || Array.isArray(extra)) {
-        throw new Error('`extra` must be an object.');
+        throw new Error("'extra' must be an object.");
     }
 }
 
 export function validateKey(key) {
     if (typeof key !== 'string') {
-        throw new Error('`key` must be a string.');
+        throw new Error("'key' must be a string.");
     }
 }
 
 export function validatePlugins(plugins) {
     if (!Array.isArray(plugins)) {
-        throw new Error('`plugins` need to be passed as an array.');
+        throw new Error("'plugins' need to be passed as an array.");
     }
 
     plugins.forEach((plugin) => {
@@ -76,7 +76,7 @@ export function createExtensionsValidator(cacheInstance) {
 
 export function validateCreateExtensionsMethod(createExtensions) {
     if (typeof createExtensions !== 'function') {
-        throw new Error('`createExtensions` must be a function.');
+        throw new Error("'createExtensions' must be a function.");
     }
 }
 
@@ -88,7 +88,7 @@ export function validateHooks(hooks) {
 
 export function validateHook({ event, handler }) {
     if (typeof event !== 'string') {
-        throw new Error('Hook\'s event must be a string.');
+        throw new Error("Hook's event must be a string.");
     }
 
     if (!event.startsWith('pre') && !event.startsWith('post')) {
@@ -96,6 +96,6 @@ export function validateHook({ event, handler }) {
     }
 
     if (typeof handler !== 'function') {
-        throw new Error('Hook\'s handler must be a function.');
+        throw new Error("Hook's handler must be a function.");
     }
 }

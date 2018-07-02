@@ -53,7 +53,7 @@ describe('createCache', () => {
     context('when adapter is not an object', () => {
         it('should throw', () => {
             nonObjectValues.forEach((adapterDouble) => {
-                expect(createCache.bind(null, adapterDouble)).to.throw('`adapter` must be an object.');
+                expect(createCache.bind(null, adapterDouble)).to.throw("'adapter' must be an object.");
             });
         });
     });
@@ -95,7 +95,7 @@ describe('createCache', () => {
             it('should throw', () => {
                 nonStringValues.forEach((methodName) => {
                     expect(getPostData.bind(null, methodName))
-                        .to.throw('`methodName` must be a string.');
+                        .to.throw("'methodName' must be a string.");
                 });
             });
         });
@@ -104,15 +104,15 @@ describe('createCache', () => {
             it('should throw', () => {
                 nonObjectValues.forEach((value) => {
                     expect(getPostData.bind(null, 'someMethodName', value))
-                        .to.throw('`args` must be an object.');
+                        .to.throw("'args' must be an object.");
                 });
             });
         });
 
-        context('when args don\'t contain cacheInstance', () => {
+        context(`when args don't contain cacheInstance`, () => {
             it('should throw', () => {
                 expect(getPostData.bind(null, 'someMethodName', {}))
-                    .to.throw('`args` must contain `cacheInstance` property.');
+                    .to.throw("'args' must contain 'cacheInstance' property.");
             });
         });
 
@@ -164,7 +164,7 @@ describe('createCache', () => {
         });
 
         context('when there is a hook for given event', () => {
-            it('should return args handled by that hook\'s handler (whatever it does)', () => {
+            it(`should return args handled by that hook's handler (whatever it does)`, () => {
                 const args = { foo: 'bar', cacheInstance: cache };
                 const stub = sinon.stub().returnsArg(0);
                 const hook = {
@@ -193,7 +193,7 @@ describe('createCache', () => {
             postStub.resetHistory();
         });
 
-        it('should build key using adapter\'s buildKey method', () => {
+        it(`should build key using adapter's buildKey method`, () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
 
             dummyAdapter.buildKey.resetHistory();
@@ -220,7 +220,7 @@ describe('createCache', () => {
                 ]);
             });
 
-            it('should pass data through that hook\'s handlers', () => {
+            it(`should pass data through that hook's handlers`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
                 const expectedPreArgs = {
                     cacheInstance: cache,
@@ -266,7 +266,7 @@ describe('createCache', () => {
                 expect(key).to.eq(adapterBuiltKey);
             });
 
-            it('should build key using adapter\'s buildKey method', () => {
+            it(`should build key using adapter's buildKey method`, () => {
                 cache.buildKey(FOO_KEY);
 
                 expect(dummyAdapter.buildKey)
@@ -285,7 +285,7 @@ describe('createCache', () => {
             postStub.resetHistory();
         });
 
-        it('should build key using adapter\'s buildKey method', () => {
+        it(`should build key using adapter's buildKey method`, () => {
             cache.getItem(FOO_KEY);
 
             expect(dummyAdapter.buildKey)
@@ -293,7 +293,7 @@ describe('createCache', () => {
                 .to.have.been.calledOnce;
         });
 
-        it('should get item using adapter\'s getItem method', () => {
+        it(`should get item using adapter's getItem method`, () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
             const expectedItem = createItem(adapterBuiltKey, FOO_VALUE);
             const item = cache.getItem(FOO_KEY);
@@ -318,7 +318,7 @@ describe('createCache', () => {
                 ]);
             });
 
-            it('should pass data through that hook\'s handlers', () => {
+            it(`should pass data through that hook's handlers`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
                 const item = createItem(adapterBuiltKey, FOO_VALUE);
                 const expectedPreArgs = {
@@ -367,7 +367,7 @@ describe('createCache', () => {
                 expect(item).to.deep.eq(expectedItem);
             });
 
-            it('should get item using adapter\'s getItem method', () => {
+            it(`should get item using adapter's getItem method`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
 
                 cache.getItem(FOO_KEY);
@@ -388,7 +388,7 @@ describe('createCache', () => {
             postStub.resetHistory();
         });
 
-        it('should build key using adapter\'s buildKey method', () => {
+        it(`should build key using adapter's buildKey method`, () => {
             cache.getExtra(FOO_KEY);
 
             expect(dummyAdapter.buildKey)
@@ -396,7 +396,7 @@ describe('createCache', () => {
                 .to.have.been.calledOnce;
         });
 
-        it('should get extra using adapter\'s getExtra method', () => {
+        it(`should get extra using adapter's getExtra method`, () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
             const item = createItem(adapterBuiltKey, FOO_VALUE);
             const extra = cache.getExtra(FOO_KEY);
@@ -421,7 +421,7 @@ describe('createCache', () => {
                 ]);
             });
 
-            it('should pass data through that hook\'s handlers', () => {
+            it(`should pass data through that hook's handlers`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
                 const item = createItem(adapterBuiltKey, FOO_VALUE);
                 const extra = item.extra;
@@ -471,7 +471,7 @@ describe('createCache', () => {
                 expect(item).to.deep.eq(expectedItem);
             });
 
-            it('should get item using adapter\'s getItem method', () => {
+            it(`should get item using adapter's getItem method`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
 
                 cache.getItem(FOO_KEY);
@@ -492,7 +492,7 @@ describe('createCache', () => {
             postStub.resetHistory();
         });
 
-        it('should build key using adapter\'s buildKey method', () => {
+        it(`should build key using adapter's buildKey method`, () => {
             cache.setItem(FOO_KEY, FOO_VALUE);
 
             expect(dummyAdapter.buildKey)
@@ -500,7 +500,7 @@ describe('createCache', () => {
                 .to.have.been.calledOnce;
         });
 
-        it('should set item using adapter\'s setItem method', () => {
+        it(`should set item using adapter's setItem method`, () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_WITH_EXTRA_KEY);
             const item = createItem(adapterBuiltKey, FOO_VALUE, FOO_EXTRA);
             const setItem = cache.setItem(FOO_WITH_EXTRA_KEY, FOO_VALUE, FOO_EXTRA);
@@ -525,7 +525,7 @@ describe('createCache', () => {
                 ]);
             });
 
-            it('should pass data through that hook\'s handlers', () => {
+            it(`should pass data through that hook's handlers`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_WITH_EXTRA_KEY);
                 const item = createItem(adapterBuiltKey, FOO_VALUE, FOO_EXTRA);
                 const expectedPreArgs = {
@@ -578,7 +578,7 @@ describe('createCache', () => {
                 expect(item).to.deep.eq(expectedItem);
             });
 
-            it('should set item using adapter\'s setItem method', () => {
+            it(`should set item using adapter's setItem method`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_WITH_EXTRA_KEY);
 
                 cache.setItem(FOO_WITH_EXTRA_KEY, FOO_VALUE, FOO_EXTRA);
@@ -609,7 +609,7 @@ describe('createCache', () => {
                 .to.have.been.calledOnce;
         });
 
-        it('should build key using adapter\'s buildKey method', () => {
+        it(`should build key using adapter's buildKey method`, () => {
             cache.setExtra(FOO_KEY, FOO_EXTRA);
 
             expect(dummyAdapter.buildKey)
@@ -617,7 +617,7 @@ describe('createCache', () => {
                 .to.have.been.calledTwice;
         });
 
-        it('should set extra using adapter\'s setExtra method', () => {
+        it(`should set extra using adapter's setExtra method`, () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
             const setExtra = cache.setExtra(FOO_KEY, FOO_EXTRA);
 
@@ -650,7 +650,7 @@ describe('createCache', () => {
                 }
             });
 
-            it('should happen before using adapter\'s setExtra method', () => {
+            it(`should happen before using adapter's setExtra method`, () => {
                 try {
                     cache.setExtra(FOO_KEY, null);
                 }
@@ -671,7 +671,7 @@ describe('createCache', () => {
             context('when extra is not an object', () => {
                 it('should throw', () => {
                     nonObjectValues.forEach((extra) => {
-                        expect(cache.setExtra.bind(cache, FOO_KEY, extra)).to.throw('`extra` must be an object.');
+                        expect(cache.setExtra.bind(cache, FOO_KEY, extra)).to.throw("'extra' must be an object.");
                     });
                 });
             });
@@ -699,7 +699,7 @@ describe('createCache', () => {
                 ]);
             });
 
-            it('should pass data through that hook\'s handlers', () => {
+            it(`should pass data through that hook's handlers`, () => {
                 const expectedPreArgs = {
                     cacheInstance: cache,
                     extra: FOO_EXTRA,
@@ -745,7 +745,7 @@ describe('createCache', () => {
                 expect(setExtra).to.deep.eq(FOO_EXTRA);
             });
 
-            it('should set extra using adapter\'s setExtra method', () => {
+            it(`should set extra using adapter's setExtra method`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
 
                 cache.setExtra(FOO_KEY, FOO_EXTRA);
@@ -776,7 +776,7 @@ describe('createCache', () => {
                 .to.have.been.calledOnce;
         });
 
-        it('should build key using adapter\'s buildKey method', () => {
+        it(`should build key using adapter's buildKey method`, () => {
             cache.addExtra(FOO_KEY, FOO_EXTRA);
 
             expect(dummyAdapter.buildKey)
@@ -784,7 +784,7 @@ describe('createCache', () => {
                 .to.have.been.calledTwice;
         });
 
-        it('should add extra using adapter\'s addExtra method', () => {
+        it(`should add extra using adapter's addExtra method`, () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
             const addedExtra = cache.addExtra(FOO_KEY, FOO_EXTRA);
 
@@ -817,7 +817,7 @@ describe('createCache', () => {
                 }
             });
 
-            it('should happen before using adapter\'s addExtra method', () => {
+            it(`should happen before using adapter's addExtra method`, () => {
                 try {
                     cache.addExtra(FOO_KEY, null);
                 }
@@ -838,7 +838,7 @@ describe('createCache', () => {
             context('when extra is not an object', () => {
                 it('should throw', () => {
                     nonObjectValues.forEach((extra) => {
-                        expect(cache.addExtra.bind(cache, FOO_KEY, extra)).to.throw('`extra` must be an object.');
+                        expect(cache.addExtra.bind(cache, FOO_KEY, extra)).to.throw("'extra' must be an object.");
                     });
                 });
             });
@@ -866,7 +866,7 @@ describe('createCache', () => {
                 ]);
             });
 
-            it('should pass data through that hook\'s handlers', () => {
+            it(`should pass data through that hook's handlers`, () => {
                 const expectedPreArgs = {
                     cacheInstance: cache,
                     extra: FOO_EXTRA,
@@ -912,7 +912,7 @@ describe('createCache', () => {
                 expect(addedExtra).to.deep.eq(FOO_EXTRA);
             });
 
-            it('should set extra using adapter\'s addExtra method', () => {
+            it(`should set extra using adapter's addExtra method`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
 
                 cache.addExtra(FOO_KEY, FOO_EXTRA);
@@ -933,7 +933,7 @@ describe('createCache', () => {
             postStub.resetHistory();
         });
 
-        it('should build key using adapter\'s buildKey method', () => {
+        it(`should build key using adapter's buildKey method`, () => {
             cache.hasItem(FOO_KEY);
 
             expect(dummyAdapter.buildKey)
@@ -941,7 +941,7 @@ describe('createCache', () => {
                 .to.have.been.calledOnce;
         });
 
-        it('should check item\'s existence using adapter\'s hasItem method', () => {
+        it(`should check item's existence using adapter's hasItem method`, () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
             const result = cache.hasItem(FOO_KEY);
 
@@ -965,7 +965,7 @@ describe('createCache', () => {
                 ]);
             });
 
-            it('should pass data through that hook\'s handlers', () => {
+            it(`should pass data through that hook's handlers`, () => {
                 const expectedPreArgs = {
                     cacheInstance: cache,
                     key: FOO_KEY
@@ -1001,7 +1001,7 @@ describe('createCache', () => {
         });
 
         context('when there are no hooks for pre/post events', () => {
-            it('should check item\'s existence without passing data through pre/post event handlers', () => {
+            it(`should check item's existence without passing data through pre/post event handlers`, () => {
                 const result = cache.hasItem(FOO_KEY);
 
                 expect(preStub).to.not.have.been.called;
@@ -1010,7 +1010,7 @@ describe('createCache', () => {
                 expect(result).to.be.true;
             });
 
-            it('should check item\'s existence using adapter\'s hasItem method', () => {
+            it(`should check item's existence using adapter's hasItem method`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
 
                 cache.hasItem(FOO_KEY);
@@ -1031,7 +1031,7 @@ describe('createCache', () => {
             postStub.resetHistory();
         });
 
-        it('should build key using adapter\'s buildKey method', () => {
+        it(`should build key using adapter's buildKey method`, () => {
             cache.removeItem(FOO_KEY);
 
             expect(dummyAdapter.buildKey)
@@ -1039,7 +1039,7 @@ describe('createCache', () => {
                 .to.have.been.calledOnce;
         });
 
-        it('should remove item using adapter\'s removeItem method', () => {
+        it(`should remove item using adapter's removeItem method`, () => {
             const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
             const result = cache.removeItem(FOO_KEY);
 
@@ -1063,7 +1063,7 @@ describe('createCache', () => {
                 ]);
             });
 
-            it('should pass data through that hook\'s handlers', () => {
+            it(`should pass data through that hook's handlers`, () => {
                 const expectedPreArgs = {
                     cacheInstance: cache,
                     key: FOO_KEY
@@ -1108,7 +1108,7 @@ describe('createCache', () => {
                 expect(result).to.be.true;
             });
 
-            it('should remove item using adapter\'s removeItem method', () => {
+            it(`should remove item using adapter's removeItem method`, () => {
                 const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
 
                 cache.removeItem(FOO_KEY);
@@ -1145,7 +1145,7 @@ describe('createCache', () => {
             it('should throw', () => {
                 nonArrayValues.forEach((value) => {
                     expect(cache.registerPlugins.bind(null, value))
-                        .to.throw('`plugins` need to be passed as an array.');
+                        .to.throw("'plugins' need to be passed as an array.");
                 });
             });
         });
@@ -1193,7 +1193,7 @@ describe('createCache', () => {
                     };
 
                     expect(cache.registerPlugins.bind(cache, [ customPlugin ]))
-                        .to.throw('`createExtensions` must be a function.');
+                        .to.throw("'createExtensions' must be a function.");
                 });
             });
         });
@@ -1257,14 +1257,14 @@ describe('createCache', () => {
                 const cacheWithPlugin = cache.registerPlugins([ plugin ]);
 
                 expect(cacheWithPlugin.registerPlugins.bind(cacheWithPlugin, [ plugin ]))
-                    .to.throw('Extension \'foo\' already exists.');
+                    .to.throw("Extension 'foo' already exists.");
             });
         });
 
         context('when plugins that contain methods of the same name are registered', () => {
             it('should throw', () => {
                 expect(cache.registerPlugins.bind(cache, [ plugin, plugin ]))
-                    .to.throw('Extension \'foo\' already exists.');
+                    .to.throw("Extension 'foo' already exists.");
             });
         });
     });

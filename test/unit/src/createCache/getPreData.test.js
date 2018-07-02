@@ -17,8 +17,7 @@ describe('getPreData', () => {
     context('when method name is not passed as a string', () => {
         it('should throw', () => {
             nonStringValues.forEach((methodName) => {
-                expect(getPreData.bind(null, methodName))
-                    .to.throw('`methodName` must be a string.');
+                expect(getPreData.bind(null, methodName)).to.throw("'methodName' must be a string.");
             });
         });
     });
@@ -26,16 +25,15 @@ describe('getPreData', () => {
     context('when args are not passed as an object', () => {
         it('should throw', () => {
             nonObjectValues.forEach((value) => {
-                expect(getPreData.bind(null, 'someMethodName', value))
-                    .to.throw('`args` must be an object.');
+                expect(getPreData.bind(null, 'someMethodName', value)).to.throw("'args' must be an object.");
             });
         });
     });
 
-    context('when args don\'t contain cacheInstance', () => {
+    context(`when args don't contain cacheInstance`, () => {
         it('should throw', () => {
             expect(getPreData.bind(null, 'someMethodName', {}))
-                .to.throw('`args` must contain `cacheInstance` property.');
+                .to.throw("'args' must contain 'cacheInstance' property.");
         });
     });
 
@@ -87,7 +85,7 @@ describe('getPreData', () => {
     });
 
     context('when there is a hook for given event', () => {
-        it('should return args handled by that hook\'s handler (whatever it does)', () => {
+        it(`should return args handled by that hook's handler (whatever it does)`, () => {
             const args = { foo: 'bar', cacheInstance: cache };
             const stub = sinon.stub().returnsArg(0);
             const hook = {

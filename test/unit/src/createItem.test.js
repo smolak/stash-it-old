@@ -23,9 +23,7 @@ describe('createItem', () => {
         it('should throw', () => {
             nonStringValues.forEach((nonStringValue) => {
                 if (nonStringValue !== undefined) {
-                    expect(createItem.bind(null, nonStringValue, value)).to.throw(
-                        '`key` must be a string.'
-                    );
+                    expect(createItem.bind(null, nonStringValue, value)).to.throw("'key' must be a string.");
                 }
             });
         });
@@ -61,9 +59,7 @@ describe('createItem', () => {
         it('should throw', () => {
             nonObjectValues.forEach((nonObjectValue) => {
                 if (nonObjectValue !== undefined) {
-                    expect(createItem.bind(null, key, value, nonObjectValue)).to.throw(
-                        '`extra` must be an object.'
-                    );
+                    expect(createItem.bind(null, key, value, nonObjectValue)).to.throw("'extra' must be an object.");
                 }
             });
         });
