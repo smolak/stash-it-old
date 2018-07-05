@@ -103,6 +103,14 @@ describe('registerPlugins', () => {
         });
     });
 
+    it('should call createExtensions method with cache instance as an argument', () => {
+        cache.registerPlugins([ plugin ]);
+
+        expect(plugin.createExtensions)
+            .to.have.been.calledWithExactly(cache)
+            .to.have.been.calledOnce;
+    });
+
     it('should return cache object extended by methods from plugins', () => {
         const methods2 = {
             bam: sinon.spy(),
