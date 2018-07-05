@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { createDummyAdapter, nonArrayValues, nonFunctionValues } from 'stash-it-test-helpers';
 
 import createItem from '../../../../src/createItem';
-import { createCache } from '../../../../src/createCache';
+import { createCache, getPreData, getPostData } from '../../../../src/createCache';
 
 describe('registerPlugins', () => {
     const methods = {
@@ -103,11 +103,11 @@ describe('registerPlugins', () => {
         });
     });
 
-    it('should call createExtensions method with cache instance as an argument', () => {
+    it('should call createExtensions with cache instance, getPreData and getPostData as argument', () => {
         cache.registerPlugins([ plugin ]);
 
         expect(plugin.createExtensions)
-            .to.have.been.calledWithExactly(cache)
+            .to.have.been.calledWithExactly({ cacheInstance: cache, getPreData, getPostData })
             .to.have.been.calledOnce;
     });
 
