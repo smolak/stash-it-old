@@ -47,25 +47,25 @@ export const getPostData = (methodName, args) => {
 export function createCache(adapter) {
     validateAdapter(adapter, requiredMethods);
 
-    const hooks = {};
-
     const cacheInstance = {
+        hooks: {},
+
         addHook(hook) {
             validateHook(hook);
 
             const { event, handler } = hook;
 
-            hooks[event] ? hooks[event].push(handler) : (hooks[event] = [handler]);
+            this.hooks[event] ? this.hooks[event].push(handler) : (this.hooks[event] = [handler]);
         },
 
         addHooks(hooks) {
             validateHooks(hooks);
 
-            hooks.forEach(this.addHook);
+            hooks.forEach(this.addHook.bind(this));
         },
 
         getHooks() {
-            return hooks;
+            return this.hooks;
         },
 
         buildKey(key) {
@@ -159,11 +159,7 @@ export function createCache(adapter) {
         registerPlugins(plugins) {
             validatePlugins(plugins);
 
-            plugins.forEach(({ hooks }) => {
-                hooks ? this.addHooks(hooks) : null;
-            });
-
-            return plugins.reduce((instance, plugin) => {
+            const extendedCacheInstance = plugins.reduce((instance, plugin) => {
                 if (plugin.createExtensions) {
                     validateCreateExtensionsMethod(plugin.createExtensions);
 
@@ -174,14 +170,20 @@ export function createCache(adapter) {
 
                     extensionsValidator(extensionsFromPlugin);
 
-                    const extendedCacheInstance = Object.assign({}, instance, extensionsFromPlugin);
-                    const freezedCacheInstance = Object.freeze(extendedCacheInstance);
-
-                    return freezedCacheInstance;
+                    return Object.assign({}, instance, extensionsFromPlugin);
                 }
 
                 return instance;
             }, this);
+
+            const hooks = Object.assign({}, extendedCacheInstance.getHooks());
+            const cacheInstnaceWithHooksCopied = Object.assign({}, extendedCacheInstance, { hooks });
+
+            plugins.forEach(({ hooks }) => {
+                hooks ? cacheInstnaceWithHooksCopied.addHooks(hooks) : null;
+            });
+
+            return Object.freeze(cacheInstnaceWithHooksCopied);
         }
     };
 

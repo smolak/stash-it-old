@@ -7,7 +7,7 @@ import { createCache } from '../../../src/createCache';
 import requiredMethods from '../../../src/requiredMethods';
 
 describe('createCache', () => {
-    const expectedMethods = [
+    const expectedMethodsWithHooksProperty = [
         'addExtra',
         'addHook',
         'addHooks',
@@ -16,6 +16,7 @@ describe('createCache', () => {
         'getHooks',
         'getItem',
         'hasItem',
+        'hooks',
         'removeItem',
         'setItem',
         'setExtra',
@@ -35,7 +36,7 @@ describe('createCache', () => {
     });
 
     it('should create cache object with all methods', () => {
-        expect(cache).to.have.all.keys(expectedMethods);
+        expect(cache).to.have.all.keys(expectedMethodsWithHooksProperty);
     });
 
     context('when adapter is not an object', () => {
