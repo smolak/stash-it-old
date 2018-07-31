@@ -44,6 +44,16 @@ export const getPostData = (methodName, args) => {
     return passDataThroughHooks(hooks, event, args);
 };
 
+function cloneHooks(hooks) {
+    const cloned = {};
+
+    Object.entries(hooks).forEach(([ event, handlers ]) => {
+        cloned[event] = handlers.map((handler) => handler);
+    });
+
+    return cloned;
+}
+
 export function createCache(adapter) {
     validateAdapter(adapter, requiredMethods);
 
@@ -175,19 +185,16 @@ export function createCache(adapter) {
 
                 return instance;
             }, this);
-
-            const hooks = Object.assign({}, extendedCacheInstance.getHooks());
-            const cacheInstnaceWithHooksCopied = Object.assign({}, extendedCacheInstance, { hooks });
+            const hooks = cloneHooks(extendedCacheInstance.getHooks());
+            const cacheInstanceWithHooksCopied = Object.assign({}, extendedCacheInstance, { hooks });
 
             plugins.forEach(({ hooks }) => {
-                hooks ? cacheInstnaceWithHooksCopied.addHooks(hooks) : null;
+                hooks ? cacheInstanceWithHooksCopied.addHooks(hooks) : null;
             });
 
-            return Object.freeze(cacheInstnaceWithHooksCopied);
+            return Object.freeze(cacheInstanceWithHooksCopied);
         }
     };
 
-    const freezedCacheInstance = Object.freeze(cacheInstance);
-
-    return freezedCacheInstance;
+    return Object.freeze(cacheInstance);
 }

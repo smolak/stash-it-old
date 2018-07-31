@@ -184,19 +184,35 @@ describe('registerPlugins', () => {
     });
 
     describe('hooks inheritance', () => {
-        context('when hooks are registered using registerPlugins method', () => {
+        context('when different hooks are registered using registerPlugins method', () => {
             it('should add hooks only to returned cache object, not the original one', () => {
                 const hooksFromInitialCache = cache.getHooks();
 
-                const cacheWithFirstPlugin = cache.registerPlugins([ pluginWithExtensionsAndHooks ]);
+                const cacheWithFirstPlugin = cache.registerPlugins([ pluginWithHooksOnly ]);
+                const hooksFromCacheWithFirstPlugin = cacheWithFirstPlugin.getHooks();
+
+                const cacheWithFirstAndSecondPlugin = cacheWithFirstPlugin.registerPlugins([ pluginWithExtensionsAndHooks ]);
+                const hooksFromCacheWithBothPlugins = cacheWithFirstAndSecondPlugin.getHooks();
+
+                expect(hooksFromInitialCache).to.not.deep.equal(hooksFromCacheWithFirstPlugin);
+                expect(hooksFromCacheWithFirstPlugin).to.not.deep.equal(hooksFromCacheWithBothPlugins);
+                expect(hooksFromInitialCache).to.not.deep.equal(hooksFromCacheWithBothPlugins);
+            });
+        });
+
+        context('when the same hooks are registered using registerPlugins method', () => {
+            it('should add hooks only to returned cache object, not the original one', () => {
+                const hooksFromInitialCache = cache.getHooks();
+
+                const cacheWithFirstPlugin = cache.registerPlugins([ pluginWithHooksOnly ]);
                 const hooksFromCacheWithFirstPlugin = cacheWithFirstPlugin.getHooks();
 
                 const cacheWithFirstAndSecondPlugin = cacheWithFirstPlugin.registerPlugins([ pluginWithHooksOnly ]);
                 const hooksFromCacheWithBothPlugins = cacheWithFirstAndSecondPlugin.getHooks();
 
-                expect(hooksFromInitialCache === hooksFromCacheWithFirstPlugin).to.be.false;
-                expect(hooksFromInitialCache === hooksFromCacheWithBothPlugins).to.be.false;
-                expect(hooksFromCacheWithFirstPlugin === hooksFromCacheWithBothPlugins).to.be.false;
+                expect(hooksFromInitialCache).to.not.deep.equal(hooksFromCacheWithFirstPlugin);
+                expect(hooksFromCacheWithFirstPlugin).to.not.deep.equal(hooksFromCacheWithBothPlugins);
+                expect(hooksFromInitialCache).to.not.deep.equal(hooksFromCacheWithBothPlugins);
             });
         });
     });
