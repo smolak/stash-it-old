@@ -73,7 +73,9 @@ you will have to transpile it. See `.babelrc` file for more details.
 
 ### Documentation
 
-[https://gitbook.com/book/jaceks/stash-it](https://gitbook.com/book/jaceks/stash-it)
+[https://stash-it.gitbook.io/stash-it/](https://stash-it.gitbook.io/stash-it/)
+
+(for v2 head [over here](https://jaceks.gitbooks.io/stash-it/content/).)
 
 ### Thanks
 
