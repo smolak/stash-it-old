@@ -31,7 +31,7 @@ export const getPreData = (methodName, args) => {
     const hooks = args.cacheInstance.getHooks();
     const event = `pre${upperFirst(methodName)}`;
 
-    return passDataThroughHooks(hooks, event, args);
+    return Promise.resolve(passDataThroughHooks(hooks, event, args));
 };
 
 export const getPostData = (methodName, args) => {

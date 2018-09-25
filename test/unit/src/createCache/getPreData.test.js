@@ -37,36 +37,44 @@ describe('getPreData', () => {
         });
     });
 
-    it('should return object with the same keys as passed with cacheInstance as an additional one', () => {
+    it('should return object with the same keys as passed with cacheInstance as an additional one', (done) => {
         const args = { cacheInstance: cache, foo: 'bar' };
-        const preData = getPreData('someMethodName', args);
-        const keys = Object.keys(preData);
-        const expectedKeys = [ 'cacheInstance', 'foo' ];
 
-        expect(keys).to.deep.eq(expectedKeys);
+        getPreData('someMethodName', args).then((preData) => {
+            const keys = Object.keys(preData);
+            const expectedKeys = [ 'cacheInstance', 'foo' ];
+
+            expect(keys).to.deep.eq(expectedKeys);
+
+            done();
+        });
     });
 
-    it('should return reference to cache instance under cacheInstance property', () => {
+    it('should return reference to cache instance under cacheInstance property', (done) => {
         const handler = () => {};
 
         cache.addHook({ event: 'preSomething', handler });
 
         const args = { cacheInstance: cache, foo: 'bar' };
-        const preData = getPreData('someMethodName', args);
-        const cacheInstance = preData.cacheInstance;
-        const expectedHooks = {
-            preSomething: [
-                handler
-            ]
-        };
 
-        expect(cacheInstance === cache).to.be.true;
-        expect(cacheInstance).to.deep.equal(cache);
-        expect(cacheInstance.getHooks()).to.deep.equal(expectedHooks);
+        getPreData('someMethodName', args).then((preData) => {
+            const cacheInstance = preData.cacheInstance;
+            const expectedHooks = {
+                preSomething: [
+                    handler
+                ]
+            };
+
+            expect(cacheInstance === cache).to.be.true;
+            expect(cacheInstance).to.deep.equal(cache);
+            expect(cacheInstance.getHooks()).to.deep.equal(expectedHooks);
+
+            done();
+        });
     });
 
     context('when there is no hook for given event', () => {
-        it('should return args in an exact form as they were passed in the first place', () => {
+        it('should return args in an exact form as they were passed in the first place', (done) => {
             const args = { foo: 'bar', cacheInstance: cache };
             const spy = sinon.spy();
             const hook = {
@@ -76,16 +84,18 @@ describe('getPreData', () => {
 
             cache.addHook(hook);
 
-            const returnedArgs = getPreData('eventName', args);
+            getPreData('eventName', args).then((preData) => {
+                expect(preData === args).to.be.true;
+                expect(preData).to.deep.equal(args);
+                expect(spy).to.not.have.been.called;
 
-            expect(returnedArgs === args).to.be.true;
-            expect(returnedArgs).to.deep.equal(args);
-            expect(spy).to.not.have.been.called;
+                done();
+            });
         });
     });
 
     context('when there is a hook for given event', () => {
-        it(`should return args handled by that hook's handler (whatever it does)`, () => {
+        it(`should return args handled by that hook's handler (whatever it does)`, (done) => {
             const args = { foo: 'bar', cacheInstance: cache };
             const stub = sinon.stub().returnsArg(0);
             const hook = {
@@ -95,12 +105,14 @@ describe('getPreData', () => {
 
             cache.addHook(hook);
 
-            const returnedArgs = getPreData('eventName', args);
+            getPreData('eventName', args).then((preData) => {
+                expect(preData).to.deep.equal(args);
+                expect(stub)
+                    .to.have.been.calledWith(args)
+                    .to.have.been.calledOnce;
 
-            expect(returnedArgs).to.deep.equal(args);
-            expect(stub)
-                .to.have.been.calledWith(args)
-                .to.have.been.calledOnce;
+                done();
+            });
         });
     });
 });
