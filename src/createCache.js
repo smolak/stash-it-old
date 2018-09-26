@@ -18,10 +18,17 @@ function upperFirst(string) {
     return `${firstLetter.toUpperCase()}${restOfTheString}`;
 }
 
+const passDataThrough = (eventHandlers) => (args) => {
+    return eventHandlers.reduce(async (previousValue, handler) => {
+        return await handler(await previousValue);
+    }, args);
+};
+
 function passDataThroughHooks(hooks, event, args) {
-    return Array.isArray(hooks[event])
-        ? hooks[event].reduce(async (prev, next, index) => await hooks[event][index](await prev), args)
-        : args;
+    const eventHandlers = hooks[event];
+    const resolvedArgs = Promise.resolve(args);
+
+    return Array.isArray(eventHandlers) ? passDataThrough(eventHandlers)(resolvedArgs) : resolvedArgs;
 }
 
 export const getPreData = (methodName, args) => {
@@ -31,7 +38,7 @@ export const getPreData = (methodName, args) => {
     const hooks = args.cacheInstance.getHooks();
     const event = `pre${upperFirst(methodName)}`;
 
-    return Promise.resolve(passDataThroughHooks(hooks, event, args));
+    return passDataThroughHooks(hooks, event, args);
 };
 
 export const getPostData = (methodName, args) => {
