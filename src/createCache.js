@@ -18,7 +18,7 @@ function upperFirst(string) {
     return `${firstLetter.toUpperCase()}${restOfTheString}`;
 }
 
-const passDataThrough = (eventHandlers) => (args) => {
+const passDataThroughEventHandlers = (eventHandlers, args) => {
     return eventHandlers.reduce(async (previousValue, handler) => {
         return await handler(await previousValue);
     }, args);
@@ -28,7 +28,7 @@ function passDataThroughHooks(hooks, event, args) {
     const eventHandlers = hooks[event];
     const resolvedArgs = Promise.resolve(args);
 
-    return Array.isArray(eventHandlers) ? passDataThrough(eventHandlers)(resolvedArgs) : resolvedArgs;
+    return Array.isArray(eventHandlers) ? passDataThroughEventHandlers(eventHandlers, resolvedArgs) : resolvedArgs;
 }
 
 const getData = (when, methodName, args) => {
