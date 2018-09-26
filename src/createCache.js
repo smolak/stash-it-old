@@ -31,25 +31,18 @@ function passDataThroughHooks(hooks, event, args) {
     return Array.isArray(eventHandlers) ? passDataThrough(eventHandlers)(resolvedArgs) : resolvedArgs;
 }
 
-export const getPreData = (methodName, args) => {
+const getData = (when, methodName, args) => {
     validateMethodName(methodName);
     validateArgs(args);
 
     const hooks = args.cacheInstance.getHooks();
-    const event = `pre${upperFirst(methodName)}`;
+    const event = `${when}${upperFirst(methodName)}`;
 
     return passDataThroughHooks(hooks, event, args);
 };
 
-export const getPostData = (methodName, args) => {
-    validateMethodName(methodName);
-    validateArgs(args);
-
-    const hooks = args.cacheInstance.getHooks();
-    const event = `post${upperFirst(methodName)}`;
-
-    return passDataThroughHooks(hooks, event, args);
-};
+export const getPreData = (methodName, args) => getData('pre', methodName, args);
+export const getPostData = (methodName, args) => getData('post', methodName, args);
 
 function cloneHooks(hooks) {
     const cloned = {};
