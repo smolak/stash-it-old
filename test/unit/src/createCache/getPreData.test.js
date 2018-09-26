@@ -103,19 +103,46 @@ describe('getPreData', () => {
         });
     });
 
-    context('when there are hooks for given event', () => {
-        it('should execute handlers in sequence, waiting for one to finish, before executing next one', async () => {
-            const stallFor = async (time) => await new Promise(resolve => setTimeout(resolve, time));
-            const spyForSlowHandler = sinon.spy();
-            const handlerThatTakesLongToExecute = async () => await stallFor(50).then(spyForSlowHandler);
-            const handlerThatExecutesImmediately = sinon.spy();
-            const hookWithSlowHandler = createHook('preEventName', handlerThatTakesLongToExecute);
-            const hookWithFastHandler = createHook('preEventName', handlerThatExecutesImmediately);
+    describe('executing handlers', () => {
+        context('for synchronous handlers', () => {
+            it('should happen in sequence', async () => {
+                const hook1 = {
+                    event: 'preEventName',
+                    handler: sinon.spy()
+                };
+                const hook2 = {
+                    event: 'preEventName',
+                    handler: sinon.spy()
+                };
 
-            cacheInstance.addHooks([ hookWithSlowHandler, hookWithFastHandler ]);
-            await getPreData('eventName', anyValidArgs);
+                cacheInstance.addHooks([ hook1, hook2 ]);
+                await getPreData('eventName', anyValidArgs);
 
-            expect(spyForSlowHandler).to.have.been.calledBefore(handlerThatExecutesImmediately);
+                expect(hook1.handler).to.have.been.calledBefore(hook2.handler);
+            });
+        });
+
+        context('for asynchronous handlers', () => {
+            it('should happen in sequence', async () => {
+                const stallFor = async (time) => await new Promise(resolve => setTimeout(resolve, time));
+                const spyForSlowHandler = sinon.spy();
+                const hook1 = {
+                    event: 'preEventName',
+                    handler: async () => {
+                        await stallFor(50);
+                        spyForSlowHandler();
+                    }
+                };
+                const hook2 = {
+                    event: 'preEventName',
+                    handler: sinon.spy()
+                };
+
+                cacheInstance.addHooks([ hook1, hook2 ]);
+                await getPreData('eventName', anyValidArgs);
+
+                expect(spyForSlowHandler).to.have.been.calledBefore(hook2.handler);
+            });
         });
     });
 });
