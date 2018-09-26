@@ -6,7 +6,7 @@ import {createCache, getPreData} from '../../../../src/createCache';
 import createItem from '../../../../src/createItem';
 
 describe('getPreData', () => {
-    let cache;
+    let cacheInstance;
     let dummyAdapter;
     let anyValidArgs;
 
@@ -16,8 +16,8 @@ describe('getPreData', () => {
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
-        cache = createCache(dummyAdapter);
-        anyValidArgs = { cacheInstance: cache };
+        cacheInstance = createCache(dummyAdapter);
+        anyValidArgs = { cacheInstance };
     });
 
     context('when method name is not passed as a string', () => {
@@ -52,16 +52,16 @@ describe('getPreData', () => {
     });
 
     describe('returned cacheInstance', () => {
-        it('should return reference to cache instance under cacheInstance property', async () => {
+        it('should return reference to cacheInstance instance under cacheInstance property', async () => {
             const preData = await getPreData('someMethodName', anyValidArgs);
 
             expect(preData.cacheInstance).to.not.be.undefined;
         });
 
-        it('should return reference to cache instance', async () => {
+        it('should return reference to cacheInstance', async () => {
             const preData = await getPreData('someMethodName', anyValidArgs);
 
-            expect(preData.cacheInstance === cache).to.be.true;
+            expect(preData.cacheInstance === cacheInstance).to.be.true;
         });
     });
 
@@ -70,7 +70,7 @@ describe('getPreData', () => {
             const eventHandler = () => {};
             const hook = createHook('preSomeOtherEventName', eventHandler);
 
-            cache.addHook(hook);
+            cacheInstance.addHook(hook);
 
             const preData = await getPreData('eventName', anyValidArgs);
 
@@ -81,7 +81,7 @@ describe('getPreData', () => {
             const spy = sinon.spy();
             const hook = createHook('preSomeOtherEventName', spy);
 
-            cache.addHook(hook);
+            cacheInstance.addHook(hook);
 
             await getPreData('eventName', anyValidArgs);
 
@@ -94,7 +94,7 @@ describe('getPreData', () => {
             const identityStub = sinon.stub().returnsArg(0);
             const hook = createHook('preEventName', identityStub);
 
-            cache.addHook(hook);
+            cacheInstance.addHook(hook);
 
             const preData = await getPreData('eventName', anyValidArgs);
 
@@ -112,7 +112,7 @@ describe('getPreData', () => {
             const hookWithSlowHandler = createHook('preEventName', handlerThatTakesLongToExecute);
             const hookWithFastHandler = createHook('preEventName', handlerThatExecutesImmediately);
 
-            cache.addHooks([ hookWithSlowHandler, hookWithFastHandler ]);
+            cacheInstance.addHooks([ hookWithSlowHandler, hookWithFastHandler ]);
             await getPreData('eventName', anyValidArgs);
 
             expect(spyForSlowHandler).to.have.been.calledBefore(handlerThatExecutesImmediately);
