@@ -10,10 +10,6 @@ describe('getPreData', () => {
     let dummyAdapter;
     let anyValidArgs;
 
-    const createHook = (event, handler) => {
-        return { event, handler };
-    };
-
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
         cacheInstance = createCache(dummyAdapter);
@@ -67,10 +63,7 @@ describe('getPreData', () => {
 
     context('when there is no hook for given event', () => {
         it('should return args in an exact form as they were passed in the first place', async () => {
-            const eventHandler = () => {};
-            const hook = createHook('preSomeOtherEventName', eventHandler);
-
-            cacheInstance.addHook(hook);
+            cacheInstance.addHook({ event: 'preSomeOtherEventName', handler: () => {} });
 
             const preData = await getPreData('eventName', anyValidArgs);
 
@@ -78,23 +71,21 @@ describe('getPreData', () => {
         });
 
         it('should not pass args through hooks that were registered for that event', async () => {
-            const spy = sinon.spy();
-            const hook = createHook('preSomeOtherEventName', spy);
+            const hook = { event: 'preSomeOtherEventName', handler: sinon.spy() };
 
             cacheInstance.addHook(hook);
 
             await getPreData('eventName', anyValidArgs);
 
-            expect(spy).to.not.have.been.called;
+            expect(hook.handler).to.not.have.been.called;
         });
     });
 
     context('when there is a hook for given event', () => {
         it(`should return args handled by that hook's handler (whatever it does)`, async () => {
             const identityStub = sinon.stub().returnsArg(0);
-            const hook = createHook('preEventName', identityStub);
 
-            cacheInstance.addHook(hook);
+            cacheInstance.addHook({ event: 'preEventName', handler: identityStub });
 
             const preData = await getPreData('eventName', anyValidArgs);
 
