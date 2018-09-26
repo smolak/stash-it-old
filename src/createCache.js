@@ -20,7 +20,7 @@ function upperFirst(string) {
 
 function passDataThroughHooks(hooks, event, args) {
     return Array.isArray(hooks[event])
-        ? hooks[event].reduce((prev, next, index) => hooks[event][index](prev), args)
+        ? hooks[event].reduce(async (prev, next, index) => await hooks[event][index](await prev), args)
         : args;
 }
 

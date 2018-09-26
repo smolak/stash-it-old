@@ -8,10 +8,16 @@ import createItem from '../../../../src/createItem';
 describe('getPreData', () => {
     let cache;
     let dummyAdapter;
+    let anyValidArgs;
+
+    const createHook = (event, handler) => {
+        return { event, handler };
+    };
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
         cache = createCache(dummyAdapter);
+        anyValidArgs = { cacheInstance: cache };
     });
 
     context('when method name is not passed as a string', () => {
@@ -113,6 +119,22 @@ describe('getPreData', () => {
 
                 done();
             });
+        });
+    });
+
+    context('when there are hooks for given event', () => {
+        it('should execute handlers in sequence, waiting for one to finish, before executing next one', async () => {
+            const stallFor = async (time) => await new Promise(resolve => setTimeout(resolve, time));
+            const spyForSlowHandler = sinon.spy();
+            const handlerThatTakesLongToExecute = async () => await stallFor(50).then(spyForSlowHandler);
+            const handlerThatExecutesImmediately = sinon.spy();
+            const hookWithSlowHandler = createHook('preEventName', handlerThatTakesLongToExecute);
+            const hookWithFastHandler = createHook('preEventName', handlerThatExecutesImmediately);
+
+            cache.addHooks([ hookWithSlowHandler, hookWithFastHandler ]);
+            await getPreData('eventName', anyValidArgs);
+
+            expect(spyForSlowHandler).to.have.been.calledBefore(handlerThatExecutesImmediately);
         });
     });
 });
