@@ -43,17 +43,12 @@ describe('getPreData', () => {
         });
     });
 
-    it('should return object with the same keys as passed with cacheInstance as an additional one', (done) => {
-        const args = { cacheInstance: cache, foo: 'bar' };
+    it('should return object with the same keys that args were passed with (as values can differ)', async () => {
+        const preData = await getPreData('someMethodName', anyValidArgs);
+        const keys = Object.keys(preData);
+        const expectedKeys = [ 'cacheInstance' ];
 
-        getPreData('someMethodName', args).then((preData) => {
-            const keys = Object.keys(preData);
-            const expectedKeys = [ 'cacheInstance', 'foo' ];
-
-            expect(keys).to.deep.eq(expectedKeys);
-
-            done();
-        });
+        expect(keys).to.deep.eq(expectedKeys);
     });
 
     describe('returned cacheInstance', () => {
