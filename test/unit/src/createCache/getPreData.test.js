@@ -56,26 +56,17 @@ describe('getPreData', () => {
         });
     });
 
-    it('should return reference to cache instance under cacheInstance property', (done) => {
-        const handler = () => {};
+    describe('returned cacheInstance', () => {
+        it('should return reference to cache instance under cacheInstance property', async () => {
+            const preData = await getPreData('someMethodName', anyValidArgs);
 
-        cache.addHook({ event: 'preSomething', handler });
+            expect(preData.cacheInstance).to.not.be.undefined;
+        });
 
-        const args = { cacheInstance: cache, foo: 'bar' };
+        it('should return reference to cache instance', async () => {
+            const preData = await getPreData('someMethodName', anyValidArgs);
 
-        getPreData('someMethodName', args).then((preData) => {
-            const cacheInstance = preData.cacheInstance;
-            const expectedHooks = {
-                preSomething: [
-                    handler
-                ]
-            };
-
-            expect(cacheInstance === cache).to.be.true;
-            expect(cacheInstance).to.deep.equal(cache);
-            expect(cacheInstance.getHooks()).to.deep.equal(expectedHooks);
-
-            done();
+            expect(preData.cacheInstance === cache).to.be.true;
         });
     });
 
