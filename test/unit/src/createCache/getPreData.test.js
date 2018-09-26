@@ -80,23 +80,26 @@ describe('getPreData', () => {
     });
 
     context('when there is no hook for given event', () => {
-        it('should return args in an exact form as they were passed in the first place', (done) => {
-            const args = { foo: 'bar', cacheInstance: cache };
-            const spy = sinon.spy();
-            const hook = {
-                event: 'preSomeOtherEventName',
-                handler: spy
-            };
+        it('should return args in an exact form as they were passed in the first place', async () => {
+            const eventHandler = () => {};
+            const hook = createHook('preSomeOtherEventName', eventHandler);
 
             cache.addHook(hook);
 
-            getPreData('eventName', args).then((preData) => {
-                expect(preData === args).to.be.true;
-                expect(preData).to.deep.equal(args);
-                expect(spy).to.not.have.been.called;
+            const preData = await getPreData('eventName', anyValidArgs);
 
-                done();
-            });
+            expect(preData === anyValidArgs).to.be.true;
+        });
+
+        it('should not pass args through hooks that were registered for that event', async () => {
+            const spy = sinon.spy();
+            const hook = createHook('preSomeOtherEventName', spy);
+
+            cache.addHook(hook);
+
+            await getPreData('eventName', anyValidArgs);
+
+            expect(spy).to.not.have.been.called;
         });
     });
 
