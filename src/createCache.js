@@ -31,12 +31,12 @@ function passDataThroughHooks(hooks, event, args) {
     return Array.isArray(eventHandlers) ? passDataThroughEventHandlers(eventHandlers, resolvedArgs) : resolvedArgs;
 }
 
-const getData = (when, methodName, args) => {
+const getData = (prefix, methodName, args) => {
     validateMethodName(methodName);
     validateArgs(args);
 
     const hooks = args.cacheInstance.getHooks();
-    const event = `${when}${upperFirst(methodName)}`;
+    const event = `${prefix}${upperFirst(methodName)}`;
 
     return passDataThroughHooks(hooks, event, args);
 };
