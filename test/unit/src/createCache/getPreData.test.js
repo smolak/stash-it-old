@@ -101,24 +101,16 @@ describe('getPreData', () => {
     });
 
     context('when there is a hook for given event', () => {
-        it(`should return args handled by that hook's handler (whatever it does)`, (done) => {
-            const args = { foo: 'bar', cacheInstance: cache };
-            const stub = sinon.stub().returnsArg(0);
-            const hook = {
-                event: 'preEventName',
-                handler: stub
-            };
+        it(`should return args handled by that hook's handler (whatever it does)`, async () => {
+            const identityStub = sinon.stub().returnsArg(0);
+            const hook = createHook('preEventName', identityStub);
 
             cache.addHook(hook);
 
-            getPreData('eventName', args).then((preData) => {
-                expect(preData).to.deep.equal(args);
-                expect(stub)
-                    .to.have.been.calledWith(args)
-                    .to.have.been.calledOnce;
+            const preData = await getPreData('eventName', anyValidArgs);
 
-                done();
-            });
+            expect(preData).to.deep.equal(anyValidArgs);
+            expect(identityStub).to.have.been.calledWith(anyValidArgs).to.have.been.calledOnce;
         });
     });
 
