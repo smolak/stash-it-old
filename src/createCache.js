@@ -18,11 +18,11 @@ function upperFirst(string) {
     return `${firstLetter.toUpperCase()}${restOfTheString}`;
 }
 
-const passDataThroughEventHandlers = (eventHandlers, args) => {
+function passDataThroughEventHandlers(eventHandlers, args) {
     return eventHandlers.reduce(async (previousValue, handler) => {
         return await handler(await previousValue);
     }, args);
-};
+}
 
 function passDataThroughHooks(hooks, event, args) {
     const eventHandlers = hooks[event];
