@@ -20,12 +20,12 @@ describe('buildKey method', () => {
         postStub.resetHistory();
     });
 
-    it(`should build key using adapter's buildKey method`, () => {
-        const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
+    it(`should build key using adapter's buildKey method`, async () => {
+        const adapterBuiltKey = await dummyAdapter.buildKey(FOO_KEY);
 
         dummyAdapter.buildKey.resetHistory();
 
-        const key = cache.buildKey(FOO_KEY);
+        const key = await cache.buildKey(FOO_KEY);
 
         expect(key).to.eq(adapterBuiltKey);
         expect(dummyAdapter.buildKey)
@@ -47,8 +47,8 @@ describe('buildKey method', () => {
             ]);
         });
 
-        it(`should pass data through that hook's handlers`, () => {
-            const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
+        it(`should pass data through that hook's handlers`, async () => {
+            const adapterBuiltKey = await dummyAdapter.buildKey(FOO_KEY);
             const expectedPreArgs = {
                 cacheInstance: cache,
                 key: FOO_KEY
@@ -58,7 +58,7 @@ describe('buildKey method', () => {
                 key: adapterBuiltKey
             };
 
-            cache.buildKey(FOO_KEY);
+            await cache.buildKey(FOO_KEY);
 
             expect(preStub)
                 .to.have.been.calledWith(expectedPreArgs)
@@ -69,8 +69,8 @@ describe('buildKey method', () => {
                 .to.have.been.calledOnce;
         });
 
-        it('should call getPreData, buildKey, getPostData in correct sequence', () => {
-            cache.buildKey(FOO_KEY);
+        it('should call getPreData, buildKey, getPostData in correct sequence', async () => {
+            await cache.buildKey(FOO_KEY);
 
             expect(preStub).to.have.been.calledOnce;
             expect(dummyAdapter.buildKey)
@@ -83,9 +83,9 @@ describe('buildKey method', () => {
     });
 
     context('when there are no hooks for pre/post events', () => {
-        it('should build key without passing data through pre/post event handlers', () => {
-            const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-            const key = cache.buildKey(FOO_KEY);
+        it('should build key without passing data through pre/post event handlers', async () => {
+            const adapterBuiltKey = await dummyAdapter.buildKey(FOO_KEY);
+            const key = await cache.buildKey(FOO_KEY);
 
             expect(preStub).to.not.have.been.called;
             expect(postStub).to.not.have.been.called;
@@ -93,8 +93,8 @@ describe('buildKey method', () => {
             expect(key).to.eq(adapterBuiltKey);
         });
 
-        it(`should build key using adapter's buildKey method`, () => {
-            cache.buildKey(FOO_KEY);
+        it(`should build key using adapter's buildKey method`, async () => {
+            await cache.buildKey(FOO_KEY);
 
             expect(dummyAdapter.buildKey)
                 .to.have.been.calledWith(FOO_KEY)
