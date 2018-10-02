@@ -31,6 +31,14 @@ function passDataThroughHooks(hooks, event, args) {
     return Array.isArray(eventHandlers) ? passDataThroughEventHandlers(eventHandlers, resolvedArgs) : resolvedArgs;
 }
 
+export function emit(eventName, args) {
+    validateArgs(args);
+
+    const hooks = args.cacheInstance.getHooks();
+
+    return passDataThroughHooks(hooks, eventName, args);
+}
+
 const getData = (prefix, methodName, args) => {
     validateMethodName(methodName);
     validateArgs(args);
