@@ -14,20 +14,23 @@ describe('buildKey method', () => {
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
+        dummyAdapter.buildKey.resetHistory();
+
         cache = createCache(dummyAdapter);
 
         preStub.resetHistory();
         postStub.resetHistory();
     });
 
-    it(`should build key using adapter's buildKey method`, async () => {
-        const adapterBuiltKey = await dummyAdapter.buildKey(FOO_KEY);
-
-        dummyAdapter.buildKey.resetHistory();
-
+    it('should return a key', async () => {
         const key = await cache.buildKey(FOO_KEY);
 
-        expect(key).to.eq(adapterBuiltKey);
+        expect(key).to.not.be.undefined;
+    });
+
+    it(`should build key using adapter's buildKey method`, async () => {
+        await cache.buildKey(FOO_KEY);
+
         expect(dummyAdapter.buildKey)
             .to.have.been.calledWith(FOO_KEY)
             .to.have.been.calledOnce;
