@@ -25,7 +25,7 @@ describe('buildKey method', () => {
     it('should return a key', async () => {
         const key = await cache.buildKey(FOO_KEY);
 
-        expect(key).to.not.be.undefined;
+        expect(key).to.be.a('string');
     });
 
     it(`should build key using adapter's buildKey method`, async () => {
