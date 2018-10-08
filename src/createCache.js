@@ -20,7 +20,7 @@ function upperFirst(string) {
 
 function passDataThroughEventHandlers(eventHandlers, args) {
     return eventHandlers.reduce(async (previousValue, handler) => {
-        return await handler(await previousValue);
+        return handler(await previousValue);
     }, args);
 }
 
