@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
-import { createDummyAdapter, FOO_KEY } from 'stash-it-test-helpers';
+import { createDummyAdapter } from 'stash-it-test-helpers';
 
 import createItem from '../../../../src/createItem';
 import { createCache } from '../../../../src/createCache';
@@ -14,7 +14,7 @@ describe('buildKey method', () => {
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
-        dummyAdapter.buildKey.withArgs(FOO_KEY).returns('keyBuiltByAdapter');
+        dummyAdapter.buildKey.withArgs('key').returns('keyBuiltByAdapter');
         dummyAdapter.buildKey.resetHistory();
 
         cache = createCache(dummyAdapter);
@@ -24,16 +24,16 @@ describe('buildKey method', () => {
     });
 
     it('should return a key', async () => {
-        const key = await cache.buildKey(FOO_KEY);
+        const key = await cache.buildKey('key');
 
         expect(key).to.be.a('string');
     });
 
     it(`should build key using adapter's buildKey method`, async () => {
-        await cache.buildKey(FOO_KEY);
+        await cache.buildKey('key');
 
         expect(dummyAdapter.buildKey)
-            .to.have.been.calledWith(FOO_KEY)
+            .to.have.been.calledWith('key')
             .to.have.been.calledOnce;
     });
 
@@ -45,10 +45,10 @@ describe('buildKey method', () => {
             };
 
             cache.addHook(hook);
-            await cache.buildKey(FOO_KEY);
+            await cache.buildKey('key');
 
             expect(hook.handler)
-                .to.have.been.calledWith({ cacheInstance: cache, key: FOO_KEY })
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'key' })
                 .to.have.been.calledOnce;
         });
 
@@ -59,7 +59,7 @@ describe('buildKey method', () => {
             };
 
             cache.addHook(hook);
-            await cache.buildKey(FOO_KEY);
+            await cache.buildKey('key');
 
             expect(dummyAdapter.buildKey)
                 .to.have.been.calledWith('keyReturnedByHandler')
@@ -75,7 +75,7 @@ describe('buildKey method', () => {
             };
 
             cache.addHook(hook);
-            await cache.buildKey(FOO_KEY);
+            await cache.buildKey('key');
 
             expect(hook.handler)
                 .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter' })
@@ -90,7 +90,7 @@ describe('buildKey method', () => {
 
             cache.addHook(hook);
 
-            const key = await cache.buildKey(FOO_KEY);
+            const key = await cache.buildKey('key');
 
             expect(key).to.equal('keyReturnedByHandler');
         });
@@ -98,8 +98,8 @@ describe('buildKey method', () => {
 
     context('when there are no hooks for pre/post events', () => {
         it('should build key without passing data through pre/post event handlers', async () => {
-            const adapterBuiltKey = await dummyAdapter.buildKey(FOO_KEY);
-            const key = await cache.buildKey(FOO_KEY);
+            const adapterBuiltKey = await dummyAdapter.buildKey('key');
+            const key = await cache.buildKey('key');
 
             expect(preStub).to.not.have.been.called;
             expect(postStub).to.not.have.been.called;
@@ -108,10 +108,10 @@ describe('buildKey method', () => {
         });
 
         it(`should build key using adapter's buildKey method`, async () => {
-            await cache.buildKey(FOO_KEY);
+            await cache.buildKey('key');
 
             expect(dummyAdapter.buildKey)
-                .to.have.been.calledWith(FOO_KEY)
+                .to.have.been.calledWith('key')
                 .to.have.been.calledOnce;
         });
     });
