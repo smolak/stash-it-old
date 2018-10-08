@@ -6,20 +6,23 @@ import createItem from '../../../../src/createItem';
 import { createCache } from '../../../../src/createCache';
 
 describe('buildKey method', () => {
-    const preStub = sinon.stub().returnsArg(0);
-    const postStub = sinon.stub().returnsArg(0);
+    const preStub = sinon.stub();
+    const postStub = sinon.stub();
 
     let cache;
     let dummyAdapter;
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
-        dummyAdapter.buildKey.withArgs('key').returns('keyBuiltByAdapter');
+        dummyAdapter.buildKey.returns('keyBuiltByAdapter');
         dummyAdapter.buildKey.resetHistory();
 
         cache = createCache(dummyAdapter);
 
+        preStub.returnsArg(0);
         preStub.resetHistory();
+
+        postStub.returnsArg(0);
         postStub.resetHistory();
     });
 
@@ -93,6 +96,57 @@ describe('buildKey method', () => {
             const key = await cache.buildKey('key');
 
             expect(key).to.equal('keyReturnedByHandler');
+        });
+    });
+
+    context('when there are hooks for both preBuildKey and postBuildKey events', () => {
+        beforeEach(() => {
+            preStub.reset();
+            preStub.returns({ cacheInstance: cache, key: 'keyReturnedByPreHandler' });
+
+            postStub.reset();
+            postStub.returns({ cacheInstance: cache, key: 'keyReturnedByPostHandler' });
+
+            const hook1 = {
+                event: 'preBuildKey',
+                handler: preStub
+            };
+            const hook2 = {
+                event: 'postBuildKey',
+                handler: postStub
+            };
+
+            cache.addHooks([ hook1, hook2 ]);
+        });
+
+        it(`should pass data containing key through preBuildKey handler`, async () => {
+            await cache.buildKey('key');
+
+            expect(preStub)
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'key' })
+                .to.have.been.calledOnce;
+        });
+
+        it(`should pass key, returned by that event's handler, to adapter's buildKey method`, async () => {
+            await cache.buildKey('key');
+
+            expect(dummyAdapter.buildKey)
+                .to.have.been.calledWith('keyReturnedByPreHandler')
+                .to.have.been.calledOnce;
+        });
+
+        it(`should pass data containing key, built by adapters method, through postBuildKey handler`, async () => {
+            await cache.buildKey('key');
+
+            expect(postStub)
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter' })
+                .to.have.been.calledOnce;
+        });
+
+        it('should return key, returned by postBuildKey handler', async () => {
+            const key = await cache.buildKey('key');
+
+            expect(key).to.equal('keyReturnedByPostHandler');
         });
     });
 
