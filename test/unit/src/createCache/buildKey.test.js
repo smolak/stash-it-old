@@ -14,6 +14,7 @@ describe('buildKey method', () => {
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
+        dummyAdapter.buildKey.withArgs(FOO_KEY).returns('keyBuiltByAdapter');
         dummyAdapter.buildKey.resetHistory();
 
         cache = createCache(dummyAdapter);
@@ -36,52 +37,62 @@ describe('buildKey method', () => {
             .to.have.been.calledOnce;
     });
 
-    context('when there are hooks for pre/post events', () => {
-        beforeEach(() => {
-            cache.addHooks([
-                {
-                    event: 'preBuildKey',
-                    handler: preStub
-                },
-                {
-                    event: 'postBuildKey',
-                    handler: postStub
-                }
-            ]);
-        });
-
-        it(`should pass data through that hook's handlers`, async () => {
-            const adapterBuiltKey = await dummyAdapter.buildKey(FOO_KEY);
-            const expectedPreArgs = {
-                cacheInstance: cache,
-                key: FOO_KEY
-            };
-            const expectedPostArgs = {
-                cacheInstance: cache,
-                key: adapterBuiltKey
+    context('when there is a hook for preBuildKey event', () => {
+        it(`should pass data containing key through that event's handler`, async () => {
+            const hook = {
+                event: 'preBuildKey',
+                handler: preStub
             };
 
+            cache.addHook(hook);
             await cache.buildKey(FOO_KEY);
 
-            expect(preStub)
-                .to.have.been.calledWith(expectedPreArgs)
-                .to.have.been.calledOnce;
-
-            expect(postStub)
-                .to.have.been.calledWith(expectedPostArgs)
+            expect(hook.handler)
+                .to.have.been.calledWith({ cacheInstance: cache, key: FOO_KEY })
                 .to.have.been.calledOnce;
         });
 
-        it('should call getPreData, buildKey, getPostData in correct sequence', async () => {
+        it(`should pass key, returned by that event's handler, to adapter's buildKey method`, async () => {
+            const hook = {
+                event: 'preBuildKey',
+                handler: () => { return { cacheInstance: cache, key: 'keyReturnedByHandler' }; }
+            };
+
+            cache.addHook(hook);
             await cache.buildKey(FOO_KEY);
 
-            expect(preStub).to.have.been.calledOnce;
             expect(dummyAdapter.buildKey)
-                .to.have.been.calledAfter(preStub)
+                .to.have.been.calledWith('keyReturnedByHandler')
                 .to.have.been.calledOnce;
-            expect(postStub)
-                .to.have.been.calledAfter(dummyAdapter.buildKey)
+        });
+    });
+
+    context('when there is a hook for postBuildKey event', () => {
+        it(`should pass data containing key, built by adapter, through that event's handler`, async () => {
+            const hook = {
+                event: 'postBuildKey',
+                handler: postStub
+            };
+
+            cache.addHook(hook);
+            await cache.buildKey(FOO_KEY);
+
+            expect(hook.handler)
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter' })
                 .to.have.been.calledOnce;
+        });
+
+        it(`should return key, returned by that event's handler`, async () => {
+            const hook = {
+                event: 'postBuildKey',
+                handler: () => { return { cacheInstance: cache, key: 'keyReturnedByHandler' }; }
+            };
+
+            cache.addHook(hook);
+
+            const key = await cache.buildKey(FOO_KEY);
+
+            expect(key).to.equal('keyReturnedByHandler');
         });
     });
 
