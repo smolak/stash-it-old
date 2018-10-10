@@ -96,26 +96,29 @@ export function createCache(adapter) {
 
         getItem(key) {
             const preData = getPreData('getItem', { cacheInstance: this, key });
-            const item = adapter.getItem(this.buildKey(preData.key));
-            const postData = getPostData('getItem', { cacheInstance: preData.cacheInstance, key: preData.key, item });
+            const builtKey = this.buildKey(preData.key);
+            const item = adapter.getItem(builtKey);
+            const postData = getPostData('getItem', { cacheInstance: preData.cacheInstance, key: builtKey, item });
 
             return postData.item;
         },
 
         getExtra(key) {
             const preData = getPreData('getExtra', { cacheInstance: this, key });
-            const extra = adapter.getExtra(this.buildKey(preData.key));
-            const postData = getPostData('getExtra', { cacheInstance: preData.cacheInstance, key: preData.key, extra });
+            const builtKey = this.buildKey(preData.key);
+            const extra = adapter.getExtra(builtKey);
+            const postData = getPostData('getExtra', { cacheInstance: preData.cacheInstance, key: builtKey, extra });
 
             return postData.extra;
         },
 
         setItem(key, value, extra = {}) {
             const preData = getPreData('setItem', { cacheInstance: this, key, value, extra });
-            const item = adapter.setItem(this.buildKey(preData.key), preData.value, preData.extra);
+            const builtKey = this.buildKey(preData.key);
+            const item = adapter.setItem(builtKey, preData.value, preData.extra);
             const postData = getPostData('setItem', {
                 cacheInstance: preData.cacheInstance,
-                key: preData.key,
+                key: builtKey,
                 value: preData.value,
                 extra: preData.extra,
                 item
@@ -156,18 +159,20 @@ export function createCache(adapter) {
 
         hasItem(key) {
             const preData = getPreData('hasItem', { cacheInstance: this, key });
-            const result = adapter.hasItem(this.buildKey(preData.key));
-            const postData = getPostData('hasItem', { cacheInstance: preData.cacheInstance, key: preData.key, result });
+            const builtKey = this.buildKey(preData.key);
+            const result = adapter.hasItem(builtKey);
+            const postData = getPostData('hasItem', { cacheInstance: preData.cacheInstance, key: builtKey, result });
 
             return postData.result;
         },
 
         removeItem(key) {
             const preData = getPreData('removeItem', { cacheInstance: this, key });
-            const result = adapter.removeItem(this.buildKey(preData.key));
+            const builtKey = this.buildKey(preData.key);
+            const result = adapter.removeItem(builtKey);
             const postData = getPostData('removeItem', {
                 cacheInstance: preData.cacheInstance,
-                key: preData.key,
+                key: builtKey,
                 result
             });
 
