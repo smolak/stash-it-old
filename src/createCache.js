@@ -94,11 +94,11 @@ export function createCache(adapter) {
             return postData.key;
         },
 
-        getItem(key) {
-            const preData = getPreData('getItem', { cacheInstance: this, key });
-            const builtKey = this.buildKey(preData.key);
-            const item = adapter.getItem(builtKey);
-            const postData = getPostData('getItem', { cacheInstance: preData.cacheInstance, key: builtKey, item });
+        async getItem(key) {
+            const preData = await getPreData('getItem', { cacheInstance: this, key });
+            const builtKey = await this.buildKey(preData.key);
+            const item = await adapter.getItem(builtKey);
+            const postData = await getPostData('getItem', { cacheInstance: preData.cacheInstance, key: builtKey, item });
 
             return postData.item;
         },
