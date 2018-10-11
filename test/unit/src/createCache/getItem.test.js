@@ -132,7 +132,7 @@ describe('getItem method', () => {
         it(`should call that event's handler with data containing adapter-built key and got item`, async () => {
             await cache.getItem('key');
 
-            expect(hook.handler)
+            expect(postGetItemHandlerStub)
                 .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter', item: itemReturnedByAdapter })
                 .to.have.been.calledOnce;
         });
@@ -145,6 +145,15 @@ describe('getItem method', () => {
     });
 
     context('when there are hooks for both preGetItem and postGetItem events', () => {
+        const hook1 = {
+            event: 'preGetItem',
+            handler: preGetItemHandlerStub
+        };
+        const hook2 = {
+            event: 'postGetItem',
+            handler: postGetItemHandlerStub
+        };
+
         beforeEach(() => {
             preGetItemHandlerStub.reset();
             preGetItemHandlerStub.returns({ cacheInstance: cache, key: 'keyReturnedByPreHandler' });
@@ -152,15 +161,6 @@ describe('getItem method', () => {
             postGetItemHandlerStub.reset();
             postGetItemHandlerStub
                 .returns({ cacheInstance: cache, key: 'keyReturnedByPostHandler', item: itemReturnedByPostGetItem });
-
-            const hook1 = {
-                event: 'preGetItem',
-                handler: preGetItemHandlerStub
-            };
-            const hook2 = {
-                event: 'postGetItem',
-                handler: postGetItemHandlerStub
-            };
 
             cache.addHooks([ hook1, hook2 ]);
         });
