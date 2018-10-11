@@ -26,10 +26,11 @@ describe('getItem method', () => {
         cache = createCache(dummyAdapter);
 
         preGetItemHandlerStub.reset();
-        preGetItemHandlerStub.returnsArg(0);
+        preGetItemHandlerStub.returns({ cacheInstance: cache, key: 'keyReturnedByPreHandler' });
 
         postGetItemHandlerStub.reset();
-        postGetItemHandlerStub.returnsArg(0);
+        postGetItemHandlerStub
+            .returns({ cacheInstance: cache, key: 'keyReturnedByPostHandler', item: itemReturnedByPostGetItem });
     });
 
     it(`should build a key using adapter`, async () => {
@@ -55,15 +56,11 @@ describe('getItem method', () => {
     });
 
     context('when there is a hook for preGetItem event', () => {
-        const hook = {
-            event: 'preGetItem',
-            handler: preGetItemHandlerStub
-        };
-
         beforeEach(() => {
-            preGetItemHandlerStub.reset();
-            preGetItemHandlerStub
-                .returns({ cacheInstance: cache, key: 'keyReturnedByPreHandler' });
+            const hook = {
+                event: 'preGetItem',
+                handler: preGetItemHandlerStub
+            };
 
             cache.addHook(hook);
         });
@@ -71,7 +68,7 @@ describe('getItem method', () => {
         it(`should call that event's handler with data containing the key`, async () => {
             await cache.getItem('key');
 
-            expect(hook.handler)
+            expect(preGetItemHandlerStub)
                 .to.have.been.calledWith({ cacheInstance: cache, key: 'key' })
                 .to.have.been.calledOnce;
         });
@@ -100,15 +97,11 @@ describe('getItem method', () => {
     });
 
     context('when there is a hook for postGetItem event', () => {
-        const hook = {
-            event: 'postGetItem',
-            handler: postGetItemHandlerStub
-        };
-
         beforeEach(() => {
-            postGetItemHandlerStub.reset();
-            postGetItemHandlerStub
-                .returns({ cacheInstance: cache, key: 'keyReturnedByPostHandler', item: itemReturnedByPostGetItem });
+            const hook = {
+                event: 'postGetItem',
+                handler: postGetItemHandlerStub
+            };
 
             cache.addHook(hook);
         });
@@ -145,22 +138,15 @@ describe('getItem method', () => {
     });
 
     context('when there are hooks for both preGetItem and postGetItem events', () => {
-        const hook1 = {
-            event: 'preGetItem',
-            handler: preGetItemHandlerStub
-        };
-        const hook2 = {
-            event: 'postGetItem',
-            handler: postGetItemHandlerStub
-        };
-
         beforeEach(() => {
-            preGetItemHandlerStub.reset();
-            preGetItemHandlerStub.returns({ cacheInstance: cache, key: 'keyReturnedByPreHandler' });
-
-            postGetItemHandlerStub.reset();
-            postGetItemHandlerStub
-                .returns({ cacheInstance: cache, key: 'keyReturnedByPostHandler', item: itemReturnedByPostGetItem });
+            const hook1 = {
+                event: 'preGetItem',
+                handler: preGetItemHandlerStub
+            };
+            const hook2 = {
+                event: 'postGetItem',
+                handler: postGetItemHandlerStub
+            };
 
             cache.addHooks([ hook1, hook2 ]);
         });
