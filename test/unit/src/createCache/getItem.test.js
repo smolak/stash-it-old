@@ -25,12 +25,12 @@ describe('getItem method', () => {
 
         cache = createCache(dummyAdapter);
 
-        preGetItemHandlerStub.reset();
         preGetItemHandlerStub.returns({ cacheInstance: cache, key: 'keyReturnedByPreHandler' });
+        preGetItemHandlerStub.resetHistory();
 
-        postGetItemHandlerStub.reset();
         postGetItemHandlerStub
             .returns({ cacheInstance: cache, key: 'keyReturnedByPostHandler', item: itemReturnedByPostGetItem });
+        postGetItemHandlerStub.resetHistory();
     });
 
     it(`should build a key using adapter`, async () => {
