@@ -9,7 +9,7 @@ describe('getExtra method', () => {
     const preGetExtraHandlerStub = sinon.stub();
     const postGetExtraHandlerStub = sinon.stub();
     const extraReturnedByAdapter = { some: 'extraData' };
-    const extraReturnedByPostGetItem = { some: 'extraData' };
+    const extraReturnedByPostGetExtra = { some: 'extraData' };
 
     let cache;
     let dummyAdapter;
@@ -29,7 +29,7 @@ describe('getExtra method', () => {
         preGetExtraHandlerStub.resetHistory();
 
         postGetExtraHandlerStub
-            .returns({ cacheInstance: cache, key: 'keyReturnedByPostHandler', extra: extraReturnedByPostGetItem });
+            .returns({ cacheInstance: cache, key: 'keyReturnedByPostHandler', extra: extraReturnedByPostGetExtra });
         postGetExtraHandlerStub.resetHistory();
     });
 
@@ -133,7 +133,7 @@ describe('getExtra method', () => {
         it('should return the extra returned by postGetExtra handler', async () => {
             const extra = await cache.getExtra('key');
 
-            expect(extra).to.equal(extraReturnedByPostGetItem);
+            expect(extra).to.equal(extraReturnedByPostGetExtra);
         });
     });
 
@@ -186,7 +186,7 @@ describe('getExtra method', () => {
         it('should return extra, returned by postGetExtra handler', async () => {
             const extra = await cache.getExtra('key');
 
-            expect(extra).to.equal(extraReturnedByPostGetItem);
+            expect(extra).to.equal(extraReturnedByPostGetExtra);
         });
     });
 });
