@@ -12,6 +12,7 @@ describe('getItem method', () => {
     const itemReturnedByPostGetItem = createItem('anyKey', 'anyValue');
 
     let cache;
+    let cacheReturnedByPreGetItemHandler;
     let dummyAdapter;
 
     beforeEach(() => {
@@ -24,8 +25,9 @@ describe('getItem method', () => {
         dummyAdapter.getItem.resetHistory();
 
         cache = createCache(dummyAdapter);
+        cacheReturnedByPreGetItemHandler = Object.assign({}, { some: 'apiExtension' }, cache);
 
-        preGetItemHandlerStub.returns({ cacheInstance: cache, key: 'keyReturnedByPreHandler' });
+        preGetItemHandlerStub.returns({ cacheInstance: cacheReturnedByPreGetItemHandler, key: 'keyReturnedByPreHandler' });
         preGetItemHandlerStub.resetHistory();
 
         postGetItemHandlerStub
@@ -41,7 +43,7 @@ describe('getItem method', () => {
             .to.have.been.calledOnce;
     });
 
-    it(`should get an item using adapter and key built by adapter`, async () => {
+    it(`should get an item using adapter`, async () => {
         await cache.getItem('key');
 
         expect(dummyAdapter.getItem)
@@ -65,7 +67,7 @@ describe('getItem method', () => {
             cache.addHook(hook);
         });
 
-        it(`should call that event's handler with data containing the key`, async () => {
+        it(`should call that event's handler with data required for that event`, async () => {
             await cache.getItem('key');
 
             expect(preGetItemHandlerStub)
@@ -80,20 +82,6 @@ describe('getItem method', () => {
                 .to.have.been.calledWith('keyReturnedByPreHandler')
                 .to.have.been.calledOnce;
         });
-
-        it(`should get an item using adapter and key built by adapter`, async () => {
-            await cache.getItem('key');
-
-            expect(dummyAdapter.getItem)
-                .to.have.been.calledWith('keyBuiltByAdapter')
-                .to.have.been.calledOnce;
-        });
-
-        it('should return an item got by adapter', async () => {
-            const item = await cache.getItem('key');
-
-            expect(item).to.equal(itemReturnedByAdapter);
-        });
     });
 
     context('when there is a hook for postGetItem event', () => {
@@ -106,23 +94,7 @@ describe('getItem method', () => {
             cache.addHook(hook);
         });
 
-        it(`should build a key using adapter`, async () => {
-            await cache.getItem('key');
-
-            expect(dummyAdapter.buildKey)
-                .to.have.been.calledWith('key')
-                .to.have.been.calledOnce;
-        });
-
-        it(`should get an item using adapter and key built by adapter`, async () => {
-            await cache.getItem('key');
-
-            expect(dummyAdapter.getItem)
-                .to.have.been.calledWith('keyBuiltByAdapter')
-                .to.have.been.calledOnce;
-        });
-
-        it(`should call that event's handler with data containing adapter-built key and got item`, async () => {
+        it(`should call that event's handler with data required for that event`, async () => {
             await cache.getItem('key');
 
             expect(postGetItemHandlerStub)
@@ -151,42 +123,16 @@ describe('getItem method', () => {
             cache.addHooks([ hook1, hook2 ]);
         });
 
-        it(`should pass data containing key through preGetItem handler`, async () => {
-            await cache.getItem('key');
-
-            expect(preGetItemHandlerStub)
-                .to.have.been.calledWith({ cacheInstance: cache, key: 'key' })
-                .to.have.been.calledOnce;
-        });
-
-        it(`should pass key, returned by preGetItem handler, to adapter's buildKey method`, async () => {
-            await cache.getItem('key');
-
-            expect(dummyAdapter.buildKey)
-                .to.have.been.calledWith('keyReturnedByPreHandler')
-                .to.have.been.calledOnce;
-        });
-
-        it(`should pass key, returned by adapter's buildKey, to adapter's getItem method`, async () => {
-            await cache.getItem('key');
-
-            expect(dummyAdapter.getItem)
-                .to.have.been.calledWith('keyBuiltByAdapter')
-                .to.have.been.calledOnce;
-        });
-
-        it(`should pass data containing key and item from adapter, through postGetItem handler`, async () => {
+        it(`should call postGetItem's event handler with data returned by preGetItem`, async () => {
             await cache.getItem('key');
 
             expect(postGetItemHandlerStub)
-                .to.have.been.calledWith({ cacheInstance: cache, item: itemReturnedByAdapter, key: 'keyBuiltByAdapter' })
+                .to.have.been.calledWith({
+                    cacheInstance: cacheReturnedByPreGetItemHandler,
+                    key: 'keyBuiltByAdapter',
+                    item: itemReturnedByAdapter
+                })
                 .to.have.been.calledOnce;
-        });
-
-        it('should return item, returned by postGetItem handler', async () => {
-            const item = await cache.getItem('key');
-
-            expect(item).to.equal(itemReturnedByPostGetItem);
         });
     });
 });
