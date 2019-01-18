@@ -14,6 +14,7 @@ describe('setItem method', () => {
     const itemReturnedByPostSetItem = createItem('anyKey', 'anyValue');
 
     let cache;
+    let cacheReturnedByPreSetItemHandler;
     let dummyAdapter;
 
     beforeEach(() => {
@@ -26,9 +27,10 @@ describe('setItem method', () => {
         dummyAdapter.setItem.resetHistory();
 
         cache = createCache(dummyAdapter);
+        cacheReturnedByPreSetItemHandler = Object.assign({}, { some: 'apiExtension' }, cache);
 
         preSetItemHandlerStub.returns({
-            cacheInstance: cache,
+            cacheInstance: cacheReturnedByPreSetItemHandler,
             key: 'keyReturnedByPreHandler',
             value: 'valueReturnedByPreHandler',
             extra: { extraReturnedBy: 'preHandler'}
@@ -132,7 +134,7 @@ describe('setItem method', () => {
             cache.addHook(hook);
         });
 
-        it(`should call that event's handler with data containing adapter-built key, value, default extra and adapter-got item`, async () => {
+        it(`should call that event's handler with data required for that event`, async () => {
             await cache.setItem('key', 'value');
 
             expect(postSetItemHandlerStub)
@@ -190,7 +192,7 @@ describe('setItem method', () => {
 
             expect(postSetItemHandlerStub)
                 .to.have.been.calledWith({
-                    cacheInstance: cache,
+                    cacheInstance: cacheReturnedByPreSetItemHandler,
                     key: 'keyBuiltByAdapter',
                     value: 'valueReturnedByPreHandler',
                     item: itemReturnedByAdapter,
