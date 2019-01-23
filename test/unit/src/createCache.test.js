@@ -7,6 +7,7 @@ import { createCache } from '../../../src/createCache';
 import requiredMethods from '../../../src/requiredMethods';
 
 describe('createCache', () => {
+    const hooksProperty = 'hooks';
     const expectedMethodsWithHooksProperty = [
         'addExtra',
         'addHook',
@@ -16,11 +17,11 @@ describe('createCache', () => {
         'getHooks',
         'getItem',
         'hasItem',
-        'hooks',
         'removeItem',
         'setItem',
         'setExtra',
-        'registerPlugins'
+        'registerPlugins',
+        hooksProperty
     ];
 
     let cache;
