@@ -1,124 +1,203 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
-import {
-    createDummyAdapter,
-    FOO_KEY,
-    FOO_VALUE,
-    FOO_WITH_EXTRA_KEY,
-    FOO_EXTRA
-} from 'stash-it-test-helpers';
+import { createDummyAdapter } from 'stash-it-test-helpers';
 
 import createItem from '../../../../src/createItem';
 import { createCache } from '../../../../src/createCache';
 
 describe('setItem method', () => {
-    const preStub = sinon.stub().returnsArg(0);
-    const postStub = sinon.stub().returnsArg(0);
+    const defaultExtra = {};
+    const extra = { some: 'extraData' };
+    const preSetItemHandlerStub = sinon.stub();
+    const postSetItemHandlerStub = sinon.stub();
+    const itemReturnedByAdapter = createItem('anyKey', 'anyValue');
+    const itemReturnedByPostSetItem = createItem('anyKey', 'anyValue');
 
     let cache;
+    let cacheReturnedByPreSetItemHandler;
     let dummyAdapter;
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
-        cache = createCache(dummyAdapter);
 
-        preStub.resetHistory();
-        postStub.resetHistory();
+        dummyAdapter.buildKey.returns('keyBuiltByAdapter');
+        dummyAdapter.buildKey.resetHistory();
+
+        dummyAdapter.setItem.returns(itemReturnedByAdapter);
+        dummyAdapter.setItem.resetHistory();
+
+        cache = createCache(dummyAdapter);
+        cacheReturnedByPreSetItemHandler = Object.assign({}, { some: 'apiExtension' }, cache);
+
+        preSetItemHandlerStub.returns({
+            cacheInstance: cacheReturnedByPreSetItemHandler,
+            key: 'keyReturnedByPreHandler',
+            value: 'valueReturnedByPreHandler',
+            extra: { extraReturnedBy: 'preHandler'}
+        });
+        preSetItemHandlerStub.resetHistory();
+
+        postSetItemHandlerStub.returns({
+            cacheInstance: cache,
+            key: 'keyReturnedByPostHandler',
+            value: 'valueReturnedByPostHandler',
+            extra: { extraReturnedBy: 'postHandler'},
+            item: itemReturnedByPostSetItem
+        });
+        postSetItemHandlerStub.resetHistory();
     });
 
-    it(`should build key using adapter's buildKey method`, () => {
-        cache.setItem(FOO_KEY, FOO_VALUE);
+    it(`should build a key using an adapter`, async () => {
+        await cache.setItem('key', 'value');
 
         expect(dummyAdapter.buildKey)
-            .to.have.been.calledWith(FOO_KEY)
+            .to.have.been.calledWith('key')
             .to.have.been.calledOnce;
     });
 
-    it(`should set item using adapter's setItem method`, () => {
-        const adapterBuiltKey = dummyAdapter.buildKey(FOO_WITH_EXTRA_KEY);
-        const item = createItem(adapterBuiltKey, FOO_VALUE, FOO_EXTRA);
-        const setItem = cache.setItem(FOO_WITH_EXTRA_KEY, FOO_VALUE, FOO_EXTRA);
+    it(`should set an item using adapter`, async () => {
+        await cache.setItem('key', 'value');
 
-        expect(setItem).to.deep.eq(item);
         expect(dummyAdapter.setItem)
-            .to.have.been.calledWith(adapterBuiltKey, FOO_VALUE, FOO_EXTRA)
+            .to.have.been.calledWith('keyBuiltByAdapter', 'value', defaultExtra)
             .to.have.been.calledOnce;
     });
 
-    context('when there are hooks for pre/post events', () => {
+    it('should return an item set by adapter', async () => {
+        const item = await cache.setItem('key', 'value');
+
+        expect(item).to.equal(itemReturnedByAdapter);
+    });
+
+    context('when extra is passed', () => {
+        it(`should use that extra to set an item`, async () => {
+            await cache.setItem('key', 'value', extra);
+
+            expect(dummyAdapter.setItem)
+                .to.have.been.calledWith('keyBuiltByAdapter', 'value', extra)
+                .to.have.been.calledOnce;
+        });
+    });
+
+    context('when there is a hook for preSetItem event', () => {
         beforeEach(() => {
-            cache.addHooks([
+            const hook = {
+                event: 'preSetItem',
+                handler: preSetItemHandlerStub
+            };
+
+            cache.addHook(hook);
+        });
+
+        it(`should call that event's handler with data required for that event`, async () => {
+            await cache.setItem('key', 'value');
+
+            expect(preSetItemHandlerStub)
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'key', value: 'value', extra: {} })
+                .to.have.been.calledOnce;
+        });
+
+        context('when extra is passed', () => {
+            it(`should call that event's handler with data containing passed extra`, async () => {
+                await cache.setItem('key', 'value', extra);
+
+                expect(preSetItemHandlerStub)
+                    .to.have.been.calledWith({ cacheInstance: cache, key: 'key', value: 'value', extra })
+                    .to.have.been.calledOnce;
+            });
+        });
+
+        it(`should build a key using adapter and key returned by event's handler`, async () => {
+            await cache.setItem('key', 'value');
+
+            expect(dummyAdapter.buildKey)
+                .to.have.been.calledWith('keyReturnedByPreHandler')
+                .to.have.been.calledOnce;
+        });
+
+        it(`should set an item using adapter with data returned by event's handler and built key`, async () => {
+            await cache.setItem('key', 'value');
+
+            expect(dummyAdapter.setItem)
+                .to.have.been.calledWithExactly('keyBuiltByAdapter', 'valueReturnedByPreHandler', { extraReturnedBy: 'preHandler' })
+                .to.have.been.calledOnce;
+        });
+    });
+
+    context('when there is a hook for postSetItem event', () => {
+        beforeEach(() => {
+            const hook = {
+                event: 'postSetItem',
+                handler: postSetItemHandlerStub
+            };
+
+            cache.addHook(hook);
+        });
+
+        it(`should call that event's handler with data required for that event`, async () => {
+            await cache.setItem('key', 'value');
+
+            expect(postSetItemHandlerStub)
+                .to.have.been.calledWith({
+                    cacheInstance: cache,
+                    key: 'keyBuiltByAdapter',
+                    value: 'value',
+                    item: itemReturnedByAdapter,
+                    extra: {}
+                })
+                .to.have.been.calledOnce;
+        });
+
+        it('should return an item returned by postSetItem handler', async () => {
+            const extra = await cache.setItem('key', 'value');
+
+            expect(extra).to.equal(itemReturnedByPostSetItem);
+        });
+
+        context('when extra is passed', () => {
+            it(`should call that event's handler with data containing passed extra`, async () => {
+                await cache.setItem('key', 'value', extra);
+
+                expect(postSetItemHandlerStub)
+                    .to.have.been.calledWith({
+                        cacheInstance: cache,
+                        key: 'keyBuiltByAdapter',
+                        value: 'value',
+                        item: itemReturnedByAdapter,
+                        extra
+                    })
+                    .to.have.been.calledOnce;
+            });
+        });
+    });
+
+    context('when there are hooks for both preSetItem and postSetItem', () => {
+        beforeEach(() => {
+            const hooks = [
                 {
                     event: 'preSetItem',
-                    handler: preStub
+                    handler: preSetItemHandlerStub
                 },
                 {
                     event: 'postSetItem',
-                    handler: postStub
+                    handler: postSetItemHandlerStub
                 }
-            ]);
+            ];
+
+            cache.addHooks(hooks);
         });
 
-        it(`should pass data through that hook's handlers`, () => {
-            const adapterBuiltKey = dummyAdapter.buildKey(FOO_WITH_EXTRA_KEY);
-            const item = createItem(adapterBuiltKey, FOO_VALUE, FOO_EXTRA);
-            const expectedPreArgs = {
-                cacheInstance: cache,
-                extra: FOO_EXTRA,
-                key: FOO_WITH_EXTRA_KEY,
-                value: FOO_VALUE
-            };
-            const expectedPostArgs = {
-                cacheInstance: cache,
-                extra: FOO_EXTRA,
-                item,
-                key: FOO_WITH_EXTRA_KEY,
-                value: FOO_VALUE
-            };
+        it(`should call postSetItem's event handler with data returned by preSetItem`, async () => {
+            await cache.setItem('key', 'value', extra);
 
-            cache.setItem(FOO_WITH_EXTRA_KEY, FOO_VALUE, FOO_EXTRA);
-
-            expect(preStub)
-                .to.have.been.calledWith(expectedPreArgs)
-                .to.have.been.calledOnce;
-
-            expect(postStub)
-                .to.have.been.calledWith(expectedPostArgs)
-                .to.have.been.calledOnce;
-        });
-
-        it('should call getPreData, setItem, getPostData in correct sequence', () => {
-            cache.setItem(FOO_KEY, FOO_VALUE);
-
-            expect(preStub).to.have.been.calledOnce;
-            expect(dummyAdapter.setItem)
-                .to.have.been.calledAfter(preStub)
-                .to.have.been.calledOnce;
-            expect(postStub)
-                .to.have.been.calledAfter(dummyAdapter.setItem)
-                .to.have.been.calledOnce;
-        });
-    });
-
-    context('when there are no hooks for pre/post events', () => {
-        it('should set item without passing data through pre/post event handlers', () => {
-            const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY, FOO_VALUE);
-            const expectedItem = createItem(adapterBuiltKey, FOO_VALUE);
-            const item = cache.setItem(FOO_KEY, FOO_VALUE);
-
-            expect(preStub).to.not.have.been.called;
-            expect(postStub).to.not.have.been.called;
-
-            expect(item).to.deep.eq(expectedItem);
-        });
-
-        it(`should set item using adapter's setItem method`, () => {
-            const adapterBuiltKey = dummyAdapter.buildKey(FOO_WITH_EXTRA_KEY);
-
-            cache.setItem(FOO_WITH_EXTRA_KEY, FOO_VALUE, FOO_EXTRA);
-
-            expect(dummyAdapter.setItem)
-                .to.have.been.calledWith(adapterBuiltKey, FOO_VALUE, FOO_EXTRA)
+            expect(postSetItemHandlerStub)
+                .to.have.been.calledWith({
+                    cacheInstance: cacheReturnedByPreSetItemHandler,
+                    key: 'keyBuiltByAdapter',
+                    value: 'valueReturnedByPreHandler',
+                    item: itemReturnedByAdapter,
+                    extra: { extraReturnedBy: 'preHandler'}
+                })
                 .to.have.been.calledOnce;
         });
     });

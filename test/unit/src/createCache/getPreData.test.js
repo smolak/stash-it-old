@@ -6,12 +6,14 @@ import {createCache, getPreData} from '../../../../src/createCache';
 import createItem from '../../../../src/createItem';
 
 describe('getPreData', () => {
-    let cache;
+    let cacheInstance;
     let dummyAdapter;
+    let anyValidArgs;
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
-        cache = createCache(dummyAdapter);
+        cacheInstance = createCache(dummyAdapter);
+        anyValidArgs = { cacheInstance };
     });
 
     context('when method name is not passed as a string', () => {
@@ -37,70 +39,101 @@ describe('getPreData', () => {
         });
     });
 
-    it('should return object with the same keys as passed with cacheInstance as an additional one', () => {
-        const args = { cacheInstance: cache, foo: 'bar' };
-        const preData = getPreData('someMethodName', args);
+    it('should return object with the same keys that args were passed with (as values can differ)', async () => {
+        const preData = await getPreData('someMethodName', anyValidArgs);
         const keys = Object.keys(preData);
-        const expectedKeys = [ 'cacheInstance', 'foo' ];
+        const expectedKeys = [ 'cacheInstance' ];
 
         expect(keys).to.deep.eq(expectedKeys);
     });
 
-    it('should return reference to cache instance under cacheInstance property', () => {
-        const handler = () => {};
+    describe('returned cacheInstance', () => {
+        it('should return reference to cacheInstance instance under cacheInstance property', async () => {
+            const preData = await getPreData('someMethodName', anyValidArgs);
 
-        cache.addHook({ event: 'preSomething', handler });
+            expect(preData.cacheInstance).to.not.be.undefined;
+        });
 
-        const args = { cacheInstance: cache, foo: 'bar' };
-        const preData = getPreData('someMethodName', args);
-        const cacheInstance = preData.cacheInstance;
-        const expectedHooks = {
-            preSomething: [
-                handler
-            ]
-        };
+        it('should return reference to cacheInstance', async () => {
+            const preData = await getPreData('someMethodName', anyValidArgs);
 
-        expect(cacheInstance === cache).to.be.true;
-        expect(cacheInstance).to.deep.equal(cache);
-        expect(cacheInstance.getHooks()).to.deep.equal(expectedHooks);
+            expect(preData.cacheInstance === cacheInstance).to.be.true;
+        });
     });
 
     context('when there is no hook for given event', () => {
-        it('should return args in an exact form as they were passed in the first place', () => {
-            const args = { foo: 'bar', cacheInstance: cache };
-            const spy = sinon.spy();
-            const hook = {
-                event: 'preSomeOtherEventName',
-                handler: spy
-            };
+        it('should return args in an exact form as they were passed in the first place', async () => {
+            cacheInstance.addHook({ event: 'preSomeOtherEventName', handler: () => {} });
 
-            cache.addHook(hook);
+            const preData = await getPreData('eventName', anyValidArgs);
 
-            const returnedArgs = getPreData('eventName', args);
+            expect(preData === anyValidArgs).to.be.true;
+        });
 
-            expect(returnedArgs === args).to.be.true;
-            expect(returnedArgs).to.deep.equal(args);
-            expect(spy).to.not.have.been.called;
+        it('should not pass args through hooks that were registered for that event', async () => {
+            const hook = { event: 'preSomeOtherEventName', handler: sinon.spy() };
+
+            cacheInstance.addHook(hook);
+
+            await getPreData('eventName', anyValidArgs);
+
+            expect(hook.handler).to.not.have.been.called;
         });
     });
 
     context('when there is a hook for given event', () => {
-        it(`should return args handled by that hook's handler (whatever it does)`, () => {
-            const args = { foo: 'bar', cacheInstance: cache };
-            const stub = sinon.stub().returnsArg(0);
-            const hook = {
-                event: 'preEventName',
-                handler: stub
-            };
+        it(`should return args handled by that hook's handler (whatever it does)`, async () => {
+            const identityStub = sinon.stub().returnsArg(0);
 
-            cache.addHook(hook);
+            cacheInstance.addHook({ event: 'preEventName', handler: identityStub });
 
-            const returnedArgs = getPreData('eventName', args);
+            const preData = await getPreData('eventName', anyValidArgs);
 
-            expect(returnedArgs).to.deep.equal(args);
-            expect(stub)
-                .to.have.been.calledWith(args)
-                .to.have.been.calledOnce;
+            expect(preData).to.deep.equal(anyValidArgs);
+            expect(identityStub).to.have.been.calledWith(anyValidArgs).to.have.been.calledOnce;
+        });
+    });
+
+    describe('executing handlers', () => {
+        context('for synchronous handlers', () => {
+            it('should happen in sequence', async () => {
+                const hook1 = {
+                    event: 'preEventName',
+                    handler: sinon.spy()
+                };
+                const hook2 = {
+                    event: 'preEventName',
+                    handler: sinon.spy()
+                };
+
+                cacheInstance.addHooks([ hook1, hook2 ]);
+                await getPreData('eventName', anyValidArgs);
+
+                expect(hook1.handler).to.have.been.calledBefore(hook2.handler);
+            });
+        });
+
+        context('for asynchronous handlers', () => {
+            it('should happen in sequence', async () => {
+                const stallFor = async (time) => await new Promise(resolve => setTimeout(resolve, time));
+                const spyForSlowHandler = sinon.spy();
+                const hook1 = {
+                    event: 'preEventName',
+                    handler: async () => {
+                        await stallFor(50);
+                        spyForSlowHandler();
+                    }
+                };
+                const hook2 = {
+                    event: 'preEventName',
+                    handler: sinon.spy()
+                };
+
+                cacheInstance.addHooks([ hook1, hook2 ]);
+                await getPreData('eventName', anyValidArgs);
+
+                expect(spyForSlowHandler).to.have.been.calledBefore(hook2.handler);
+            });
         });
     });
 });

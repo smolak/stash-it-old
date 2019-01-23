@@ -1,115 +1,137 @@
-import { expect } from 'chai';
 import sinon from 'sinon';
-import { createDummyAdapter, FOO_KEY, FOO_VALUE } from 'stash-it-test-helpers';
+import { expect } from 'chai';
+import { createDummyAdapter } from 'stash-it-test-helpers';
 
 import createItem from '../../../../src/createItem';
 import { createCache } from '../../../../src/createCache';
 
 describe('getExtra method', () => {
-    const preStub = sinon.stub().returnsArg(0);
-    const postStub = sinon.stub().returnsArg(0);
+    const preGetExtraHandlerStub = sinon.stub();
+    const postGetExtraHandlerStub = sinon.stub();
+    const extraReturnedByAdapter = { some: 'extraData' };
+    const extraReturnedByPostGetExtra = { some: 'extraData' };
 
     let cache;
+    let cacheReturnedByPreGetExtraHandler;
     let dummyAdapter;
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
-        cache = createCache(dummyAdapter);
 
-        preStub.resetHistory();
-        postStub.resetHistory();
+        dummyAdapter.buildKey.returns('keyBuiltByAdapter');
+        dummyAdapter.buildKey.resetHistory();
+
+        dummyAdapter.getExtra.returns(extraReturnedByAdapter);
+        dummyAdapter.getExtra.resetHistory();
+
+        cache = createCache(dummyAdapter);
+        cacheReturnedByPreGetExtraHandler = Object.assign({}, { some: 'apiExtension' }, cache);
+
+        preGetExtraHandlerStub.returns({ cacheInstance: cacheReturnedByPreGetExtraHandler, key: 'keyReturnedByPreHandler' });
+        preGetExtraHandlerStub.resetHistory();
+
+        postGetExtraHandlerStub
+            .returns({ cacheInstance: cache, key: 'keyReturnedByPostHandler', extra: extraReturnedByPostGetExtra });
+        postGetExtraHandlerStub.resetHistory();
     });
 
-    it(`should build key using adapter's buildKey method`, () => {
-        cache.getExtra(FOO_KEY);
+    it(`should build a key using an adapter`, async () => {
+        await cache.getExtra('key');
 
         expect(dummyAdapter.buildKey)
-            .to.have.been.calledWith(FOO_KEY)
+            .to.have.been.calledWith('key')
             .to.have.been.calledOnce;
     });
 
-    it(`should get extra using adapter's getExtra method`, () => {
-        const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-        const item = createItem(adapterBuiltKey, FOO_VALUE);
-        const extra = cache.getExtra(FOO_KEY);
+    it(`should return an extra using adapter`, async () => {
+        await cache.getExtra('key');
 
-        expect(extra).to.deep.eq(item.extra);
         expect(dummyAdapter.getExtra)
-            .to.have.been.calledWith(adapterBuiltKey)
+            .to.have.been.calledWith('keyBuiltByAdapter')
             .to.have.been.calledOnce;
     });
 
-    context('when there are hooks for pre/post events', () => {
+    it('should return an extra got by adapter', async () => {
+        const extra = await cache.getExtra('key');
+
+        expect(extra).to.equal(extraReturnedByAdapter);
+    });
+
+    context('when there is a hook for preGetExtra event', () => {
         beforeEach(() => {
-            cache.addHooks([
-                {
-                    event: 'preGetExtra',
-                    handler: preStub
-                },
-                {
-                    event: 'postGetExtra',
-                    handler: postStub
-                }
-            ]);
+            const hook = {
+                event: 'preGetExtra',
+                handler: preGetExtraHandlerStub
+            };
+
+            cache.addHook(hook);
         });
 
-        it(`should pass data through that hook's handlers`, () => {
-            const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-            const item = createItem(adapterBuiltKey, FOO_VALUE);
-            const extra = item.extra;
-            const expectedPreArgs = {
-                cacheInstance: cache,
-                key: FOO_KEY
-            };
-            const expectedPostArgs = {
-                cacheInstance: cache,
-                extra,
-                key: FOO_KEY
-            };
+        it(`should call that event's handler with data required for that event`, async () => {
+            await cache.getExtra('key');
 
-            cache.getExtra(FOO_KEY);
-
-            expect(preStub)
-                .to.have.been.calledWith(expectedPreArgs)
-                .to.have.been.calledOnce;
-
-            expect(postStub)
-                .to.have.been.calledWith(expectedPostArgs)
+            expect(preGetExtraHandlerStub)
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'key' })
                 .to.have.been.calledOnce;
         });
 
-        it('should call getPreData, getExtra, getPostData in correct sequence', () => {
-            cache.getExtra(FOO_KEY);
+        it(`should build a key using adapter and key returned by event's handler`, async () => {
+            await cache.getExtra('key');
 
-            expect(preStub).to.have.been.calledOnce;
-            expect(dummyAdapter.getExtra)
-                .to.have.been.calledAfter(preStub)
-                .to.have.been.calledOnce;
-            expect(postStub)
-                .to.have.been.calledAfter(dummyAdapter.getExtra)
+            expect(dummyAdapter.buildKey)
+                .to.have.been.calledWith('keyReturnedByPreHandler')
                 .to.have.been.calledOnce;
         });
     });
 
-    context('when there are no hooks for pre/post events', () => {
-        it('should get item without passing data through pre/post event handlers', () => {
-            const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
-            const expectedItem = createItem(adapterBuiltKey, FOO_VALUE);
-            const item = cache.getItem(FOO_KEY);
+    context('when there is a hook for postGetExtra event', () => {
+        beforeEach(() => {
+            const hook = {
+                event: 'postGetExtra',
+                handler: postGetExtraHandlerStub
+            };
 
-            expect(preStub).to.not.have.been.called;
-            expect(postStub).to.not.have.been.called;
-
-            expect(item).to.deep.eq(expectedItem);
+            cache.addHook(hook);
         });
 
-        it(`should get item using adapter's getItem method`, () => {
-            const adapterBuiltKey = dummyAdapter.buildKey(FOO_KEY);
+        it(`should call that event's handler with data required for that event`, async () => {
+            await cache.getExtra('key');
 
-            cache.getItem(FOO_KEY);
+            expect(postGetExtraHandlerStub)
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter', extra: extraReturnedByAdapter })
+                .to.have.been.calledOnce;
+        });
 
-            expect(dummyAdapter.getItem)
-                .to.have.been.calledWith(adapterBuiltKey)
+        it(`should return the extra returned by postGetExtra event's handler`, async () => {
+            const extra = await cache.getExtra('key');
+
+            expect(extra).to.equal(extraReturnedByPostGetExtra);
+        });
+    });
+
+    context('when there are hooks for both preGetExtra and postGetExtra events', () => {
+        beforeEach(() => {
+            const hook1 = {
+                event: 'preGetExtra',
+                handler: preGetExtraHandlerStub
+            };
+            const hook2 = {
+                event: 'postGetExtra',
+                handler: postGetExtraHandlerStub
+            };
+
+            cache.addHooks([ hook1, hook2 ]);
+        });
+
+        it(`should call postGetExtra's event handler with data returned by preGetExtra`, async () => {
+            await cache.getExtra('key');
+
+            expect(postGetExtraHandlerStub)
+                .to.have.been.calledWith({
+                    cacheInstance: cacheReturnedByPreGetExtraHandler,
+                    key: 'keyBuiltByAdapter',
+                    extra: { some: 'extraData' }
+                })
                 .to.have.been.calledOnce;
         });
     });
