@@ -146,17 +146,20 @@ export function createCache(adapter) {
             return postData.extra;
         },
 
-        setExtra(key, extra) {
-            const preData = getPreData('setExtra', { cacheInstance: this, key, extra });
+        async setExtra(key, extra) {
+            const preData = await emit('preSetExtra', { cacheInstance: this, key, extra });
 
             validateExtra(preData.extra);
 
+            const hasItem = await this.hasItem(preData.key);
+            const builtKey = await this.buildKey(preData.key);
+
             const setExtra =
-                this.hasItem(preData.key)
-                    ? adapter.setExtra(this.buildKey(preData.key), preData.extra)
+                hasItem
+                    ? await adapter.setExtra(builtKey, preData.extra)
                     : undefined;
-            const postData = getPostData('setExtra', {
-                cacheInstance: preData.cacheInstance, key: preData.key, extra: setExtra });
+            const postData = await emit('postSetExtra', {
+                cacheInstance: preData.cacheInstance, key: builtKey, extra: setExtra });
 
             return postData.extra;
         },
