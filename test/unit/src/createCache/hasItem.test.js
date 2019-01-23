@@ -9,6 +9,7 @@ describe('hasItem method', () => {
     const preHasItemHandlerStub = sinon.stub();
     const postHasItemHandlerStub = sinon.stub();
     const anyBooleanValue = true;
+    const resultReturnedByAdaptersHasItem = anyBooleanValue;
     const resultReturnedByPostHandler = anyBooleanValue;
 
     let cache;
@@ -21,7 +22,7 @@ describe('hasItem method', () => {
         dummyAdapter.buildKey.returns('keyBuiltByAdapter');
         dummyAdapter.buildKey.resetHistory();
 
-        dummyAdapter.hasItem.returns(anyBooleanValue);
+        dummyAdapter.hasItem.returns(resultReturnedByAdaptersHasItem);
         dummyAdapter.hasItem.resetHistory();
 
         cache = createCache(dummyAdapter);
@@ -116,7 +117,7 @@ describe('hasItem method', () => {
             await cache.hasItem('key');
 
             expect(postHasItemHandlerStub)
-                .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter', result: anyBooleanValue })
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter', result: resultReturnedByAdaptersHasItem })
                 .to.have.been.calledOnce;
         });
 
