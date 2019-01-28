@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { createDummyAdapter } from 'stash-it-test-helpers';
 
 import createItem from '../../../../src/createItem';
-import { createCache, getPreData, getPostData } from '../../../../src/createCache';
+import { createCache, emit } from '../../../../src/createCache';
 
 describe('registerPlugins', () => {
     const methods = {
@@ -113,7 +113,7 @@ describe('registerPlugins', () => {
             cache.registerPlugins([ pluginWithExtensionsAndHooks ]);
 
             expect(pluginWithExtensionsAndHooks.createExtensions)
-                .to.have.been.calledWithExactly({ cacheInstance: cache, getPreData, getPostData })
+                .to.have.been.calledWithExactly({ cacheInstance: cache, emit })
                 .to.have.been.calledOnce;
         });
 

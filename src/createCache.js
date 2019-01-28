@@ -195,7 +195,7 @@ export function createCache(adapter) {
 
                     const extensionsValidator = createExtensionsValidator(instance);
                     const extensionsFromPlugin = plugin.createExtensions({
-                        cacheInstance: instance, getPreData, getPostData
+                        cacheInstance: instance, emit
                     });
 
                     extensionsValidator(extensionsFromPlugin);
