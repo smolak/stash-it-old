@@ -75,9 +75,8 @@ export function createCache(adapter) {
 
         async getItem(key) {
             const preData = await emit('preGetItem', { cacheInstance: this, key });
-            const builtKey = await this.buildKey(preData.key);
-            const item = await adapter.getItem(builtKey);
-            const postData = await emit('postGetItem', { cacheInstance: preData.cacheInstance, key: builtKey, item });
+            const item = await adapter.getItem(preData.key);
+            const postData = await emit('postGetItem', { cacheInstance: preData.cacheInstance, key: preData.key, item });
 
             return postData.item;
         },

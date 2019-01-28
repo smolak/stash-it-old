@@ -18,9 +18,6 @@ describe('getItem method', () => {
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
 
-        dummyAdapter.buildKey.returns('keyBuiltByAdapter');
-        dummyAdapter.buildKey.resetHistory();
-
         dummyAdapter.getItem.returns(itemReturnedByAdapter);
         dummyAdapter.getItem.resetHistory();
 
@@ -35,19 +32,11 @@ describe('getItem method', () => {
         postGetItemHandlerStub.resetHistory();
     });
 
-    it(`should build a key using adapter`, async () => {
-        await cache.getItem('key');
-
-        expect(dummyAdapter.buildKey)
-            .to.have.been.calledWith('key')
-            .to.have.been.calledOnce;
-    });
-
     it(`should get an item using adapter`, async () => {
         await cache.getItem('key');
 
         expect(dummyAdapter.getItem)
-            .to.have.been.calledWith('keyBuiltByAdapter')
+            .to.have.been.calledWith('key')
             .to.have.been.calledOnce;
     });
 
@@ -75,10 +64,10 @@ describe('getItem method', () => {
                 .to.have.been.calledOnce;
         });
 
-        it(`should build a key using adapter and key returned by event's handler`, async () => {
+        it(`should get an item using adapter and data returned by preGetItem's handler`, async () => {
             await cache.getItem('key');
 
-            expect(dummyAdapter.buildKey)
+            expect(dummyAdapter.getItem)
                 .to.have.been.calledWith('keyReturnedByPreHandler')
                 .to.have.been.calledOnce;
         });
@@ -98,7 +87,7 @@ describe('getItem method', () => {
             await cache.getItem('key');
 
             expect(postGetItemHandlerStub)
-                .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter', item: itemReturnedByAdapter })
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'key', item: itemReturnedByAdapter })
                 .to.have.been.calledOnce;
         });
 
@@ -129,7 +118,7 @@ describe('getItem method', () => {
             expect(postGetItemHandlerStub)
                 .to.have.been.calledWith({
                     cacheInstance: cacheReturnedByPreGetItemHandler,
-                    key: 'keyBuiltByAdapter',
+                    key: 'keyReturnedByPreHandler',
                     item: itemReturnedByAdapter
                 })
                 .to.have.been.calledOnce;
