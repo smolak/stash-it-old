@@ -20,9 +20,6 @@ describe('setItem method', () => {
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
 
-        dummyAdapter.buildKey.returns('keyBuiltByAdapter');
-        dummyAdapter.buildKey.resetHistory();
-
         dummyAdapter.setItem.returns(itemReturnedByAdapter);
         dummyAdapter.setItem.resetHistory();
 
@@ -47,19 +44,11 @@ describe('setItem method', () => {
         postSetItemHandlerStub.resetHistory();
     });
 
-    it(`should build a key using an adapter`, async () => {
-        await cache.setItem('key', 'value');
-
-        expect(dummyAdapter.buildKey)
-            .to.have.been.calledWith('key')
-            .to.have.been.calledOnce;
-    });
-
     it(`should set an item using adapter`, async () => {
         await cache.setItem('key', 'value');
 
         expect(dummyAdapter.setItem)
-            .to.have.been.calledWith('keyBuiltByAdapter', 'value', defaultExtra)
+            .to.have.been.calledWith('key', 'value', defaultExtra)
             .to.have.been.calledOnce;
     });
 
@@ -74,7 +63,7 @@ describe('setItem method', () => {
             await cache.setItem('key', 'value', extra);
 
             expect(dummyAdapter.setItem)
-                .to.have.been.calledWith('keyBuiltByAdapter', 'value', extra)
+                .to.have.been.calledWith('key', 'value', extra)
                 .to.have.been.calledOnce;
         });
     });
@@ -107,19 +96,11 @@ describe('setItem method', () => {
             });
         });
 
-        it(`should build a key using adapter and key returned by event's handler`, async () => {
-            await cache.setItem('key', 'value');
-
-            expect(dummyAdapter.buildKey)
-                .to.have.been.calledWith('keyReturnedByPreHandler')
-                .to.have.been.calledOnce;
-        });
-
-        it(`should set an item using adapter with data returned by event's handler and built key`, async () => {
+        it(`should set an item with data returned by preSetItem event's handler`, async () => {
             await cache.setItem('key', 'value');
 
             expect(dummyAdapter.setItem)
-                .to.have.been.calledWithExactly('keyBuiltByAdapter', 'valueReturnedByPreHandler', { extraReturnedBy: 'preHandler' })
+                .to.have.been.calledWithExactly('keyReturnedByPreHandler', 'valueReturnedByPreHandler', { extraReturnedBy: 'preHandler' })
                 .to.have.been.calledOnce;
         });
     });
@@ -140,7 +121,7 @@ describe('setItem method', () => {
             expect(postSetItemHandlerStub)
                 .to.have.been.calledWith({
                     cacheInstance: cache,
-                    key: 'keyBuiltByAdapter',
+                    key: 'key',
                     value: 'value',
                     item: itemReturnedByAdapter,
                     extra: {}
@@ -161,7 +142,7 @@ describe('setItem method', () => {
                 expect(postSetItemHandlerStub)
                     .to.have.been.calledWith({
                         cacheInstance: cache,
-                        key: 'keyBuiltByAdapter',
+                        key: 'key',
                         value: 'value',
                         item: itemReturnedByAdapter,
                         extra
@@ -193,7 +174,7 @@ describe('setItem method', () => {
             expect(postSetItemHandlerStub)
                 .to.have.been.calledWith({
                     cacheInstance: cacheReturnedByPreSetItemHandler,
-                    key: 'keyBuiltByAdapter',
+                    key: 'keyReturnedByPreHandler',
                     value: 'valueReturnedByPreHandler',
                     item: itemReturnedByAdapter,
                     extra: { extraReturnedBy: 'preHandler'}

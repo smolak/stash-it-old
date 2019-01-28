@@ -91,11 +91,10 @@ export function createCache(adapter) {
 
         async setItem(key, value, extra = {}) {
             const preData = await emit('preSetItem', { cacheInstance: this, key, value, extra });
-            const builtKey = await this.buildKey(preData.key);
-            const item = await adapter.setItem(builtKey, preData.value, preData.extra);
+            const item = await adapter.setItem(preData.key, preData.value, preData.extra);
             const postData = await emit('postSetItem', {
                 cacheInstance: preData.cacheInstance,
-                key: builtKey,
+                key: preData.key,
                 value: preData.value,
                 extra: preData.extra,
                 item
