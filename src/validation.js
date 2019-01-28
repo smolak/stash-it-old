@@ -29,12 +29,6 @@ export function validateArgs(args) {
     }
 }
 
-export function validateMethodName(methodName) {
-    if (typeof methodName !== 'string') {
-        throw new Error("'methodName' must be a string.");
-    }
-}
-
 export function validateExtra(extra) {
     if (typeof extra !== 'object' || extra === null || Array.isArray(extra)) {
         throw new Error("'extra' must be an object.");

@@ -6,17 +6,9 @@ import {
     validateExtra,
     validateHook,
     validateHooks,
-    validateMethodName,
     validatePlugins
 } from './validation';
 import requiredMethods from './requiredMethods';
-
-function upperFirst(string) {
-    const firstLetter = string[0];
-    const restOfTheString = string.substr(1);
-
-    return `${firstLetter.toUpperCase()}${restOfTheString}`;
-}
 
 function passDataThroughEventHandlers(eventHandlers, args) {
     return eventHandlers.reduce(async (previousValue, handler) => {
@@ -38,19 +30,6 @@ export function emit(eventName, args) {
 
     return passDataThroughHooks(hooks, eventName, args);
 }
-
-const getData = (prefix, methodName, args) => {
-    validateMethodName(methodName);
-    validateArgs(args);
-
-    const hooks = args.cacheInstance.getHooks();
-    const event = `${prefix}${upperFirst(methodName)}`;
-
-    return passDataThroughHooks(hooks, event, args);
-};
-
-export const getPreData = (methodName, args) => getData('pre', methodName, args);
-export const getPostData = (methodName, args) => getData('post', methodName, args);
 
 function cloneHooks(hooks) {
     const cloned = {};
