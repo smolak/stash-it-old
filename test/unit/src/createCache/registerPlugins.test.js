@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
-import { createDummyAdapter, nonArrayValues, nonFunctionValues } from 'stash-it-test-helpers';
+import { createDummyAdapter } from 'stash-it-test-helpers';
 
 import createItem from '../../../../src/createItem';
 import { createCache, getPreData, getPostData } from '../../../../src/createCache';
@@ -67,14 +67,14 @@ describe('registerPlugins', () => {
 
     context('when plugins are not passed as an array', () => {
         it('should throw', () => {
-            nonArrayValues.forEach((value) => {
-                expect(cache.registerPlugins.bind(null, value))
-                    .to.throw("'plugins' need to be passed as an array.");
-            });
+            const notAnArray = 'but a string';
+
+            expect(cache.registerPlugins.bind(null, notAnArray))
+                .to.throw("'plugins' need to be passed as an array.");
         });
     });
 
-    context('when there are no hooks and getExtension', () => {
+    context('when there are no hooks and getExtension method', () => {
         it('should throw', () => {
             const notAPlugin = {};
 
@@ -83,27 +83,24 @@ describe('registerPlugins', () => {
         });
     });
 
-    it('should add hooks to cache instance', () => {
-        const cacheWithPlugin = cache.registerPlugins([ pluginWithExtensionsAndHooks ]);
+    context('when plugin contains hooks', () => {
+        it('should add hooks to cache instance', () => {
+            const cacheWithPlugin = cache.registerPlugins([ pluginWithHooksOnly ]);
 
-        const expectedRegisteredHooks = {
-            preSomeAction: [ preSomeActionEventHandler ]
-        };
+            const expectedRegisteredHooks = {
+                postSomeAction: [ postSomeActionEventHandler ]
+            };
 
-        expect(cacheWithPlugin.getHooks()).to.deep.equal(expectedRegisteredHooks);
+            expect(cacheWithPlugin.getHooks()).to.deep.equal(expectedRegisteredHooks);
+        });
     });
 
-    context(`when plugin's createExtensions property is not a function`, () => {
-        it('should throw', () => {
-            const nonNilValues = nonFunctionValues.filter((value) => {
-                const result = [ null, undefined, false, 0 ].includes(value);
-
-                return !result;
-            });
-
-            nonNilValues.forEach((value) => {
+    context('when plugin contains createExtensions', () => {
+        context(`when createExtensions is not a function`, () => {
+            it('should throw', () => {
+                const notAFunction = 'but a string';
                 const customPlugin = {
-                    createExtensions: value,
+                    createExtensions: notAFunction,
                     hooks: []
                 };
 
@@ -111,59 +108,48 @@ describe('registerPlugins', () => {
                     .to.throw("'createExtensions' must be a function.");
             });
         });
-    });
 
-    it('should call createExtensions with cache instance, getPreData and getPostData as argument', () => {
-        cache.registerPlugins([ pluginWithExtensionsAndHooks ]);
+        it('should call createExtensions with required arguments', () => {
+            cache.registerPlugins([ pluginWithExtensionsAndHooks ]);
 
-        expect(pluginWithExtensionsAndHooks.createExtensions)
-            .to.have.been.calledWithExactly({ cacheInstance: cache, getPreData, getPostData })
-            .to.have.been.calledOnce;
-    });
+            expect(pluginWithExtensionsAndHooks.createExtensions)
+                .to.have.been.calledWithExactly({ cacheInstance: cache, getPreData, getPostData })
+                .to.have.been.calledOnce;
+        });
 
-    it('should return cache object extended by methods from plugins', () => {
-        const cacheWithPlugins = cache.registerPlugins([ pluginWithExtensionsAndHooks, pluginWithExtensionsOnly ]);
+        it('should return cache object extended by methods from plugins', () => {
+            const cacheWithPlugins = cache.registerPlugins([ pluginWithExtensionsAndHooks, pluginWithExtensionsOnly ]);
 
-        expect(cacheWithPlugins).to.have.property('foo');
-        expect(cacheWithPlugins).to.have.property('bar');
-        expect(cacheWithPlugins).to.have.property('baz');
-        expect(cacheWithPlugins).to.have.property('bam');
+            expect(cacheWithPlugins).to.have.property('foo');
+            expect(cacheWithPlugins).to.have.property('bar');
+            expect(cacheWithPlugins).to.have.property('baz');
+            expect(cacheWithPlugins).to.have.property('bam');
 
-        cacheWithPlugins.foo();
-        cacheWithPlugins.bar();
-        cacheWithPlugins.baz();
-        cacheWithPlugins.bam();
+            cacheWithPlugins.foo();
+            cacheWithPlugins.bar();
+            cacheWithPlugins.baz();
+            cacheWithPlugins.bam();
 
-        expect(methods.foo).to.have.been.calledOnce;
-        expect(methods.bar).to.have.been.calledOnce;
-        expect(methods2.baz).to.have.been.calledOnce;
-        expect(methods2.bam).to.have.been.calledOnce;
-    });
-
-    it('should return freezed cache object', () => {
-        const cacheWithPlugins = cache.registerPlugins([ pluginWithExtensionsAndHooks ]);
-
-        expectedMethods.forEach((methodName) => {
-            try {
-                delete cacheWithPlugins[methodName];
-            } catch(e) {}
-
-            expect(cacheWithPlugins[methodName]).to.be.ok;
+            expect(methods.foo).to.have.been.calledOnce;
+            expect(methods.bar).to.have.been.calledOnce;
+            expect(methods2.baz).to.have.been.calledOnce;
+            expect(methods2.bam).to.have.been.calledOnce;
         });
     });
 
-    context(`when plugin doesn't extend cache instance with new methods`, () => {
-        it('should return freezed cache object', () => {
-            const pluginWithHooksOnly = { hooks: [] };
-            const cacheWithPlugins = cache.registerPlugins([ pluginWithHooksOnly ]);
+    it('should return freezed cache object', () => {
+        const anyPlugin = pluginWithExtensionsAndHooks;
+        const cacheWithPlugins = cache.registerPlugins([ anyPlugin ]);
+        const attemptToDeleteAMethod = (cacheInstance, methodName) => {
+            try {
+                delete cacheWithPlugins[methodName];
+            } catch (e) {}
+        };
 
-            expectedMethods.forEach((methodName) => {
-                try {
-                    delete cacheWithPlugins[methodName];
-                } catch(e) {}
+        expectedMethods.forEach((methodName) => {
+            attemptToDeleteAMethod(cacheWithPlugins, methodName);
 
-                expect(cacheWithPlugins[methodName]).to.be.ok;
-            });
+            expect(cacheWithPlugins[methodName]).to.be.ok;
         });
     });
 
