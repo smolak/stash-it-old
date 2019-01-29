@@ -8,6 +8,8 @@ import { createCache } from '../../../../src/createCache';
 describe('hasItem method', () => {
     const preHasItemHandlerStub = sinon.stub();
     const postHasItemHandlerStub = sinon.stub();
+    const keyForExistingItem = FOO_KEY;
+    const keyForNonExistentItem = NONEXISTENT_KEY;
     const anyBooleanValue = true;
     const resultReturnedByAdaptersHasItem = anyBooleanValue;
     const resultReturnedByPostHandler = anyBooleanValue;
@@ -18,9 +20,6 @@ describe('hasItem method', () => {
 
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
-
-        dummyAdapter.buildKey.returns('keyBuiltByAdapter');
-        dummyAdapter.buildKey.resetHistory();
 
         dummyAdapter.hasItem.returns(resultReturnedByAdaptersHasItem);
         dummyAdapter.hasItem.resetHistory();
@@ -42,26 +41,16 @@ describe('hasItem method', () => {
         postHasItemHandlerStub.resetHistory();
     });
 
-    it('should build key using adapter', async () => {
-        await cache.hasItem('key');
-
-        expect(dummyAdapter.buildKey)
-            .to.have.been.calledWith('key')
-            .to.have.been.calledOnce;
-    });
-
     it(`should check item's existence using adapter`, async () => {
-        const adapterBuiltKey = await dummyAdapter.buildKey(FOO_KEY);
-        await cache.hasItem(FOO_KEY);
+        await cache.hasItem(keyForExistingItem);
 
         expect(dummyAdapter.hasItem)
-            .to.have.been.calledWith(adapterBuiltKey)
+            .to.have.been.calledWith(keyForExistingItem)
             .to.have.been.calledOnce;
     });
 
     context('when item exists', () => {
         it('should return true', async () => {
-            const keyForExistingItem = FOO_KEY;
             const result = await cache.hasItem(keyForExistingItem);
 
             expect(result).to.be.true;
@@ -70,7 +59,7 @@ describe('hasItem method', () => {
 
     context(`when item doesn't exist`, () => {
         it('should return false', async () => {
-            const result = await cache.hasItem(NONEXISTENT_KEY);
+            const result = await cache.hasItem(keyForNonExistentItem);
 
             expect(result).to.be.false;
         });
@@ -94,10 +83,10 @@ describe('hasItem method', () => {
                 .to.have.been.calledOnce;
         });
 
-        it(`should build a key using adapter and key returned by event's handler`, async () => {
+        it(`should check item's existence using adapter and data returned by event's handler`, async () => {
             await cache.hasItem('key');
 
-            expect(dummyAdapter.buildKey)
+            expect(dummyAdapter.hasItem)
                 .to.have.been.calledWith('keyReturnedByPreHandler')
                 .to.have.been.calledOnce;
         });
@@ -117,7 +106,7 @@ describe('hasItem method', () => {
             await cache.hasItem('key');
 
             expect(postHasItemHandlerStub)
-                .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter', result: resultReturnedByAdaptersHasItem })
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'key', result: resultReturnedByAdaptersHasItem })
                 .to.have.been.calledOnce;
         });
 
@@ -147,10 +136,10 @@ describe('hasItem method', () => {
 
             expect(postHasItemHandlerStub)
                 .to.have.been.calledWith({
-                cacheInstance: cacheReturnedByPreHasItemHandler,
-                key: 'keyBuiltByAdapter',
-                result: resultReturnedByPostHandler
-            })
+                    cacheInstance: cacheReturnedByPreHasItemHandler,
+                    key: 'keyReturnedByPreHandler',
+                    result: resultReturnedByAdaptersHasItem
+                })
                 .to.have.been.calledOnce;
         });
     });
