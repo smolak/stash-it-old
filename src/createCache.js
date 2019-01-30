@@ -146,11 +146,10 @@ export function createCache(adapter) {
 
         async removeItem(key) {
             const preData = await emit('preRemoveItem', { cacheInstance: this, key });
-            const builtKey = await this.buildKey(preData.key);
-            const result = await adapter.removeItem(builtKey);
+            const result = await adapter.removeItem(preData.key);
             const postData = await emit('postRemoveItem', {
                 cacheInstance: preData.cacheInstance,
-                key: builtKey,
+                key: preData.key,
                 result
             });
 
