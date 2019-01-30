@@ -109,15 +109,13 @@ export function createCache(adapter) {
             validateExtra(preData.extra);
 
             const hasItem = await this.hasItem(preData.key);
-            const builtKey = await this.buildKey(preData.key);
-
             const addedExtra =
                 hasItem
-                    ? await adapter.addExtra(builtKey, preData.extra)
+                    ? await adapter.addExtra(preData.key, preData.extra)
                     : undefined;
 
             const postData = await emit('postAddExtra', {
-                cacheInstance: preData.cacheInstance, key: builtKey, extra: addedExtra });
+                cacheInstance: preData.cacheInstance, key: preData.key, extra: addedExtra });
 
             return postData.extra;
         },
