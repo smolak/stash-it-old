@@ -12,7 +12,6 @@ describe('createCache', () => {
         'addExtra',
         'addHook',
         'addHooks',
-        'buildKey',
         'getExtra',
         'getHooks',
         'getItem',

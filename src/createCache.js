@@ -65,39 +65,28 @@ export function createCache(adapter) {
             return this.hooks;
         },
 
-        async buildKey(key) {
-            const preData = await emit('preBuildKey', { cacheInstance: this, key });
-            const builtKey = await adapter.buildKey(preData.key);
-            const postData = await emit('postBuildKey', { cacheInstance: preData.cacheInstance, key: builtKey });
-
-            return postData.key;
-        },
-
         async getItem(key) {
             const preData = await emit('preGetItem', { cacheInstance: this, key });
-            const builtKey = await this.buildKey(preData.key);
-            const item = await adapter.getItem(builtKey);
-            const postData = await emit('postGetItem', { cacheInstance: preData.cacheInstance, key: builtKey, item });
+            const item = await adapter.getItem(preData.key);
+            const postData = await emit('postGetItem', { cacheInstance: preData.cacheInstance, key: preData.key, item });
 
             return postData.item;
         },
 
         async getExtra(key) {
             const preData = await emit('preGetExtra', { cacheInstance: this, key });
-            const builtKey = await this.buildKey(preData.key);
-            const extra = await adapter.getExtra(builtKey);
-            const postData = await emit('postGetExtra', { cacheInstance: preData.cacheInstance, key: builtKey, extra });
+            const extra = await adapter.getExtra(preData.key);
+            const postData = await emit('postGetExtra', { cacheInstance: preData.cacheInstance, key: preData.key, extra });
 
             return postData.extra;
         },
 
         async setItem(key, value, extra = {}) {
             const preData = await emit('preSetItem', { cacheInstance: this, key, value, extra });
-            const builtKey = await this.buildKey(preData.key);
-            const item = await adapter.setItem(builtKey, preData.value, preData.extra);
+            const item = await adapter.setItem(preData.key, preData.value, preData.extra);
             const postData = await emit('postSetItem', {
                 cacheInstance: preData.cacheInstance,
-                key: builtKey,
+                key: preData.key,
                 value: preData.value,
                 extra: preData.extra,
                 item
@@ -112,15 +101,13 @@ export function createCache(adapter) {
             validateExtra(preData.extra);
 
             const hasItem = await this.hasItem(preData.key);
-            const builtKey = await this.buildKey(preData.key);
-
             const addedExtra =
                 hasItem
-                    ? await adapter.addExtra(builtKey, preData.extra)
+                    ? await adapter.addExtra(preData.key, preData.extra)
                     : undefined;
 
             const postData = await emit('postAddExtra', {
-                cacheInstance: preData.cacheInstance, key: builtKey, extra: addedExtra });
+                cacheInstance: preData.cacheInstance, key: preData.key, extra: addedExtra });
 
             return postData.extra;
         },
@@ -131,34 +118,30 @@ export function createCache(adapter) {
             validateExtra(preData.extra);
 
             const hasItem = await this.hasItem(preData.key);
-            const builtKey = await this.buildKey(preData.key);
-
             const setExtra =
                 hasItem
-                    ? await adapter.setExtra(builtKey, preData.extra)
+                    ? await adapter.setExtra(preData.key, preData.extra)
                     : undefined;
             const postData = await emit('postSetExtra', {
-                cacheInstance: preData.cacheInstance, key: builtKey, extra: setExtra });
+                cacheInstance: preData.cacheInstance, key: preData.key, extra: setExtra });
 
             return postData.extra;
         },
 
         async hasItem(key) {
             const preData = await emit('preHasItem', { cacheInstance: this, key });
-            const builtKey = await this.buildKey(preData.key);
-            const result = await adapter.hasItem(builtKey);
-            const postData = await emit('postHasItem', { cacheInstance: preData.cacheInstance, key: builtKey, result });
+            const result = await adapter.hasItem(preData.key);
+            const postData = await emit('postHasItem', { cacheInstance: preData.cacheInstance, key: preData.key, result });
 
             return postData.result;
         },
 
         async removeItem(key) {
             const preData = await emit('preRemoveItem', { cacheInstance: this, key });
-            const builtKey = await this.buildKey(preData.key);
-            const result = await adapter.removeItem(builtKey);
+            const result = await adapter.removeItem(preData.key);
             const postData = await emit('postRemoveItem', {
                 cacheInstance: preData.cacheInstance,
-                key: builtKey,
+                key: preData.key,
                 result
             });
 

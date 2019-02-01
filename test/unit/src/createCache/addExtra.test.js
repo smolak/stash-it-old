@@ -22,16 +22,12 @@ describe('addExtra method', () => {
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
 
-        dummyAdapter.buildKey.reset();
-        dummyAdapter.buildKey.withArgs(keyForExistingItem).returns('keyBuiltByAdapter');
-        dummyAdapter.buildKey.withArgs('keyReturnedByPreHandler').returns('keyBuiltByAdapter');
-
         dummyAdapter.hasItem.reset();
-        dummyAdapter.hasItem.withArgs('keyBuiltByAdapter').returns(true);
+        dummyAdapter.hasItem.returns(true);
         dummyAdapter.hasItem.withArgs(keyForNonExistentItem).returns(false);
 
         dummyAdapter.addExtra.reset();
-        dummyAdapter.addExtra.withArgs('keyBuiltByAdapter').returns({ extra: 'addedByAdapter' });
+        dummyAdapter.addExtra.returns({ extra: 'addedByAdapter', theSame: 'asTheOneAdded' });
 
         cache = createCache(dummyAdapter);
         cacheReturnedByPreAddExtraHandler = Object.assign({}, { some: 'apiExtension' }, cache);
@@ -51,37 +47,27 @@ describe('addExtra method', () => {
         postAddExtraStub.resetHistory();
     });
 
-    it('should check if item exists using key built by adapter', async () => {
-        const adapterBuiltKey = await dummyAdapter.buildKey('key');
-
+    it('should check if item exists using adapter', async () => {
         await cache.addExtra('key', { some: 'extra' });
 
         expect(dummyAdapter.hasItem)
-            .to.have.been.calledWith(adapterBuiltKey)
+            .to.have.been.calledWith('key')
             .to.have.been.calledOnce;
     });
 
     context('when item exists', () => {
-        it(`should build key using adapter's buildKey method`, async () => {
-            await cache.addExtra(keyForExistingItem, { some: 'extra' });
-
-            expect(dummyAdapter.buildKey)
-                .to.have.been.calledWith(keyForExistingItem)
-                .to.have.been.calledTwice;
-        });
-
         it('should add extra using adapter', async () => {
             await cache.addExtra(keyForExistingItem, { some: 'extra' });
 
             expect(dummyAdapter.addExtra)
-                .to.have.been.calledWith('keyBuiltByAdapter', { some: 'extra' })
+                .to.have.been.calledWith(keyForExistingItem, { some: 'extra' })
                 .to.have.been.calledOnce;
         });
 
         it('should return added extra', async () => {
             const addedExtra = await cache.addExtra(keyForExistingItem, { some: 'extra' });
 
-            expect(addedExtra).to.deep.equal({ extra: 'addedByAdapter' });
+            expect(addedExtra).to.deep.equal({ extra: 'addedByAdapter', theSame: 'asTheOneAdded' });
         });
     });
 
@@ -96,25 +82,16 @@ describe('addExtra method', () => {
     context('when extra is not valid', () => {
         const invalidExtra = 'non object value';
 
-        it(`should throw, as extra's structure is constant for all adapters`, async () => {
-            try {
-                await cache.addExtra('key', invalidExtra);
-
-                expect('this assertion should not happen as catch should be triggered').to.be.true;
-            } catch (e) {
-                expect(e.message).to.equal(`'extra' must be an object.`);
-            }
+        it(`should throw, as extra's structure is constant for all adapters`, () => {
+            return cache.addExtra('key', invalidExtra).catch((error) => {
+                expect(error.message).to.equal(`'extra' must be an object.`);
+            });
         });
 
-        it('should throw before adding an extra by adapter', async () => {
-            try {
-                await cache.addExtra(keyForExistingItem, invalidExtra);
-
-                expect('this assertion should not happen as catch should be triggered').to.be.true;
-            }
-            catch (e) {
+        it('should throw before adding an extra by adapter', () => {
+            return cache.addExtra(keyForExistingItem, invalidExtra).catch(() => {
                 expect(dummyAdapter.addExtra).to.not.have.been.called;
-            }
+            });
         });
     });
 
@@ -136,16 +113,16 @@ describe('addExtra method', () => {
                 .to.have.been.calledOnce;
         });
 
-        it(`should build a key using adapter and key returned by event's handler`, async () => {
-            await cache.addExtra('key', { some: 'extra' });
+        it(`should add extra by adapter using data returned by event's handler`, async () => {
+            await cache.addExtra(keyForExistingItem, { some: 'extra' });
 
-            expect(dummyAdapter.buildKey)
-                .to.have.been.calledWith('keyReturnedByPreHandler')
-                .to.have.been.calledTwice;
+            expect(dummyAdapter.addExtra)
+                .to.have.been.calledWith('keyReturnedByPreHandler', { extraReturnedBy: 'preHandler' })
+                .to.have.been.calledOnce;
         });
 
         context('when a hook returns an extra that is invalid', () => {
-            it(`should throw`, async () => {
+            it(`should throw`, () => {
                 const invalidExtra = 'non object value';
 
                 preAddExtraStub.returns({
@@ -159,14 +136,9 @@ describe('addExtra method', () => {
                     handler: preAddExtraStub
                 });
 
-                try {
-                    await cache.addExtra('key', { some: 'extra' });
-
-                    expect('this assertion should not happen as catch should be triggered').to.be.true;
-                }
-                catch (e) {
-                    expect(e.message).to.equal(`'extra' must be an object.`);
-                }
+                return cache.addExtra('key', { some: 'extra' }).catch((error) => {
+                    expect(error.message).to.equal(`'extra' must be an object.`);
+                });
             });
         });
     });
@@ -185,7 +157,11 @@ describe('addExtra method', () => {
             await cache.addExtra(keyForExistingItem, { some: 'extra' });
 
             expect(postAddExtraStub)
-                .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter', extra: { extra: 'addedByAdapter' } })
+                .to.have.been.calledWith({
+                    cacheInstance: cache,
+                    key: keyForExistingItem,
+                    extra: { extra: 'addedByAdapter', theSame: 'asTheOneAdded' }
+                })
                 .to.have.been.calledOnce;
         });
 
@@ -216,8 +192,8 @@ describe('addExtra method', () => {
             expect(postAddExtraStub)
                 .to.have.been.calledWith({
                     cacheInstance: cacheReturnedByPreAddExtraHandler,
-                    key: 'keyBuiltByAdapter',
-                    extra: { extra: 'addedByAdapter' }
+                    key: 'keyReturnedByPreHandler',
+                    extra: { extra: 'addedByAdapter', theSame: 'asTheOneAdded' }
                 })
                 .to.have.been.calledOnce;
         });

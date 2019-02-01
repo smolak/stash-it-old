@@ -18,9 +18,6 @@ describe('getExtra method', () => {
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
 
-        dummyAdapter.buildKey.returns('keyBuiltByAdapter');
-        dummyAdapter.buildKey.resetHistory();
-
         dummyAdapter.getExtra.returns(extraReturnedByAdapter);
         dummyAdapter.getExtra.resetHistory();
 
@@ -35,19 +32,11 @@ describe('getExtra method', () => {
         postGetExtraHandlerStub.resetHistory();
     });
 
-    it(`should build a key using an adapter`, async () => {
-        await cache.getExtra('key');
-
-        expect(dummyAdapter.buildKey)
-            .to.have.been.calledWith('key')
-            .to.have.been.calledOnce;
-    });
-
-    it(`should return an extra using adapter`, async () => {
+    it(`should get an extra using adapter`, async () => {
         await cache.getExtra('key');
 
         expect(dummyAdapter.getExtra)
-            .to.have.been.calledWith('keyBuiltByAdapter')
+            .to.have.been.calledWith('key')
             .to.have.been.calledOnce;
     });
 
@@ -75,10 +64,10 @@ describe('getExtra method', () => {
                 .to.have.been.calledOnce;
         });
 
-        it(`should build a key using adapter and key returned by event's handler`, async () => {
+        it(`should get an extra using adapter and data returned by preGetExtra's handler`, async () => {
             await cache.getExtra('key');
 
-            expect(dummyAdapter.buildKey)
+            expect(dummyAdapter.getExtra)
                 .to.have.been.calledWith('keyReturnedByPreHandler')
                 .to.have.been.calledOnce;
         });
@@ -98,7 +87,7 @@ describe('getExtra method', () => {
             await cache.getExtra('key');
 
             expect(postGetExtraHandlerStub)
-                .to.have.been.calledWith({ cacheInstance: cache, key: 'keyBuiltByAdapter', extra: extraReturnedByAdapter })
+                .to.have.been.calledWith({ cacheInstance: cache, key: 'key', extra: extraReturnedByAdapter })
                 .to.have.been.calledOnce;
         });
 
@@ -129,7 +118,7 @@ describe('getExtra method', () => {
             expect(postGetExtraHandlerStub)
                 .to.have.been.calledWith({
                     cacheInstance: cacheReturnedByPreGetExtraHandler,
-                    key: 'keyBuiltByAdapter',
+                    key: 'keyReturnedByPreHandler',
                     extra: { some: 'extraData' }
                 })
                 .to.have.been.calledOnce;

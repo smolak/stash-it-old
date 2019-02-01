@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
-import { createDummyAdapter, FOO_KEY } from 'stash-it-test-helpers';
+import { createDummyAdapter, FOO_KEY, NONEXISTENT_KEY } from 'stash-it-test-helpers';
 
 import createItem from '../../../../src/createItem';
 import { createCache } from '../../../../src/createCache';
@@ -8,9 +8,9 @@ import { createCache } from '../../../../src/createCache';
 describe('removeItem method', () => {
     const preRemoveItemStub = sinon.stub();
     const postRemoveStub = sinon.stub();
-    const anyBooleanValue = true;
-    const resultReturnedByAdaptersRemoveItem = anyBooleanValue;
-    const resultReturnedByPostHandler = anyBooleanValue;
+    const keyForExistingItem = FOO_KEY;
+    const keyForNonExistentItem = NONEXISTENT_KEY;
+    const resultReturnedByPostRemoveItemHandler = true;
 
     let cache;
     let cacheReturnedByPreRemoveItemHandler;
@@ -19,12 +19,9 @@ describe('removeItem method', () => {
     beforeEach(() => {
         dummyAdapter = createDummyAdapter(createItem);
 
-        dummyAdapter.buildKey.reset();
-        dummyAdapter.buildKey.withArgs('key').returns('keyBuiltByAdapter');
-        dummyAdapter.buildKey.withArgs('keyReturnedByPreHandler').returns('keyBuiltByAdapter');
-
         dummyAdapter.removeItem.reset();
-        dummyAdapter.removeItem.returns(resultReturnedByAdaptersRemoveItem);
+        dummyAdapter.removeItem.returns(true);
+        dummyAdapter.removeItem.withArgs(keyForNonExistentItem).returns(false);
 
         cache = createCache(dummyAdapter);
         cacheReturnedByPreRemoveItemHandler = Object.assign({}, { some: 'apiExtension' }, cache);
@@ -38,27 +35,33 @@ describe('removeItem method', () => {
         postRemoveStub.returns({
             cacheInstance: cache,
             key: 'keyReturnedByPostHandler',
-            result: resultReturnedByPostHandler
+            result: resultReturnedByPostRemoveItemHandler
         });
         postRemoveStub.resetHistory();
     });
 
-    it(`should build key using adapter`, async () => {
+    it(`should remove an item using adapter`, async () => {
         await cache.removeItem('key');
 
-        expect(dummyAdapter.buildKey)
+        expect(dummyAdapter.removeItem)
             .to.have.been.calledWith('key')
             .to.have.been.calledOnce;
     });
 
-    it(`should remove item using adapter`, async () => {
-        const adapterBuiltKey = await dummyAdapter.buildKey('key');
-        const result = await cache.removeItem('key');
+    context('when item was removed', () => {
+        it('should return true', async () => {
+            const result = await cache.removeItem(keyForExistingItem);
 
-        expect(result).to.be.true;
-        expect(dummyAdapter.removeItem)
-            .to.have.been.calledWith(adapterBuiltKey)
-            .to.have.been.calledOnce;
+            expect(result).to.be.true;
+        });
+    });
+
+    context('when item was not removed (could not / did not exist)', () => {
+        it('should return false', async () => {
+            const result = await cache.removeItem(keyForNonExistentItem);
+
+            expect(result).to.be.false;
+        });
     });
 
     context('when there is a hook for preRemoveItem event', () => {
@@ -79,10 +82,10 @@ describe('removeItem method', () => {
                 .to.have.been.calledOnce;
         });
 
-        it(`should build a key using adapter and key returned by event's handler`, async () => {
+        it(`should remove an item using adapter and data returned by event's handler`, async () => {
             await cache.removeItem('key');
 
-            expect(dummyAdapter.buildKey)
+            expect(dummyAdapter.removeItem)
                 .to.have.been.calledWith('keyReturnedByPreHandler')
                 .to.have.been.calledOnce;
         });
@@ -99,21 +102,21 @@ describe('removeItem method', () => {
         });
 
         it(`should call that event's handler with data required for that event`, async () => {
-            await cache.removeItem('key');
+            await cache.removeItem(keyForExistingItem);
 
             expect(postRemoveStub)
                 .to.have.been.calledWith({
                     cacheInstance: cache,
-                    key: 'keyBuiltByAdapter',
-                    result: resultReturnedByAdaptersRemoveItem
+                    key: keyForExistingItem,
+                    result: true
                 })
                 .to.have.been.calledOnce;
         });
 
         it('should return result returned by postRemoveItem handler', async () => {
-            const result = await cache.removeItem('key');
+            const result = await cache.removeItem(keyForExistingItem);
 
-            expect(result).to.deep.equal(resultReturnedByPostHandler);
+            expect(result).to.equal(resultReturnedByPostRemoveItemHandler);
         });
     });
 
@@ -132,13 +135,13 @@ describe('removeItem method', () => {
         });
 
         it(`should call postRemoveItem's event handler with data returned by preRemoveItem`, async () => {
-            await cache.removeItem('key');
+            await cache.removeItem(keyForExistingItem);
 
             expect(postRemoveStub)
                 .to.have.been.calledWith({
                     cacheInstance: cacheReturnedByPreRemoveItemHandler,
-                    key: 'keyBuiltByAdapter',
-                    result: resultReturnedByPostHandler
+                    key: 'keyReturnedByPreHandler',
+                    result: true
                 })
                 .to.have.been.calledOnce;
         });
