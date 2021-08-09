@@ -14,7 +14,7 @@ fabric.properties
 *.log
 .DS_Store
 .eslintcache
-build
-coverage
+dist
 node_modules
 .nyc_output
+.prettierignore

@@ -1,0 +1,4 @@
+extension: ["ts"]
+slow: 5
+recursive: True
+require: "ts-node/register"

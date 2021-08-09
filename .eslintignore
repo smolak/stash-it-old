@@ -1,6 +1,4 @@
 .idea/
-coverage/
-build/
+dist/
 node_modules/
-*webpack.config.js
 README.md
